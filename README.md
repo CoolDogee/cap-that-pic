@@ -23,7 +23,6 @@ Just think how many times you struggle coming up with good captions for you imag
 - Cap That Pic uses *ReactJS* as the Frontend structural framework.
 - Backend architecture is implemented using *Golang*
 - *CircleCI* for continous integration and delivery with automated testing.
-<!-- - Docker -->
 - *Heroku* as a cloud platform for deployment and managing the application.
 - *Azure (Computer Vision)* API to extrate tags from user's image.
 - *MusixMatch* API to fetch lyrics corresponding to an artist.
@@ -36,7 +35,25 @@ Just think how many times you struggle coming up with good captions for you imag
 5. Connect our application with Instagram/Facebook/Twitter to share the image with caption directly without leaving our application.
 
 ## Task Assignment
-1. <u> Sahil Khokhar </u>: Build the User Interface to upload the image from local machine
-2. <u> Aniket Choudhary </u>: Make endpoints and write test cases to fetch data from MusixMatch API.
-3. <u> Shashank Jakka </u>: Make endpoints and write test cases to fetch data from Azure API.
-4. <u> Liu Songjie </u>: Implement the algorithm to generate caption by using the lyrics obtained from MusixMatch API.
+- Sahil
+    - Build the User Interface structure so that a user can upload the image from local machine or provide an image URL.
+    - Try to connect the application to Instagram/Facebook/Twitter.
+- Aniket
+    - Make endpoints and write test cases to fetch data from MusixMatch API.
+- Liu
+    - Implement the algorithm to generate caption by using the lyrics obtained from MusixMatch API.
+- Shashank
+    - Make endpoints and write test cases to fetch data from Azure API.
+
+## Day-to-Day Goals
+- Day 0
+    - [x] Come up with solo project ideas.
+    - [x] Finalize one project idea for the team.
+    - [x] Decide features that we need for MVP using a user story.
+    - [x] Brainstorm risks and challenges that we might face while building our product.
+    - [x] Come up with the USP for our product.
+    - [x] Set team assignments for the team project.
+- Day 1
+    - [ ] Make a short presentation for stakeholder meeting.
+    - [ ] Set milestones for different tasks and features.
+    - [ ] Stand-up after lunch : Catch up on progress, reset todos and milestones
