@@ -32,7 +32,7 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
 - Backend architecture is implemented using *Golang*
 - *CircleCI* for continuous integration and delivery with automated testing.
 - *Heroku* as a cloud platform for deployment and managing the application.
-- *Azure (Computer Vision)* API to extrate tags from user's image.
+- *Azure (Computer Vision)* API to extract tags from user's image.
 - *MusixMatch* API to fetch lyrics corresponding to an artist.
 
 ## Challenges
