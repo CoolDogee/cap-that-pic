@@ -63,6 +63,10 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
     - [x] Come up with the USP for our product.
     - [x] Set team assignments for the team project.
 - Day 1
-    - [ ] Make a short presentation for stakeholder meeting.
-    - [ ] Set milestones for different tasks and features.
-    - [ ] Stand-up after lunch : Catch up on progress, reset todos and milestones
+    - [x] Make a short presentation for stakeholder meeting.
+    - [x] Stand-up after lunch : Catch up on progress, reset todos and milestones
+    - [ ] Create a configuration file for CircleCI to run automated tests.
+    - [ ] Create a pipeline to integrate frontend with the backend.
+    - [ ] Find a way to deploy our app on heroku.
+    - [ ] Finish the Azure API 
+    - [ ] Implement the basic algorithm to generate caption using tags and song lyrics. 
