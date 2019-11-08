@@ -26,6 +26,7 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
 - Structured User Interface for user to upload image or enter a URL.
 - Backend architecture (routes and handling requests) to connect with Azure & MusixMatch API.
 - Custom build algorithm to generate a best matching caption based on the tags and lyrics fetched from the above APIs.
+- Use captcha to verify users 
 
 ## Technologies Used
 - Cap That Pic uses *ReactJS* as the Frontend structural framework.
@@ -70,4 +71,4 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
     - [ ] Find a way to deploy our app on heroku.
     - [ ] Create endpoints to fetch tags from the Azure API.
     - [ ] Create endpoints to fetch song lyrics from the Musixmatch API.
-    - [ ] Implement the basic algorithm to generate caption using tags and song lyrics. 
+    - [ ] Implement the basic algorithm to generate caption using tags and song lyrics.
