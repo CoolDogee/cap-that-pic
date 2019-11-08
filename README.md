@@ -41,6 +41,7 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
 3. If the random artist selected (in backend) does not have the extracted tags in it's lyrics, what to do?
 4. Ways to upload multiple images at the same time and generate captions.
 5. Connect our application with Instagram/Facebook/Twitter to share the image with caption directly without leaving our application.
+6. Integrate ReactJs with Backend written in GoLang.
 
 ## Tasks & Assignment
 - Sahil
