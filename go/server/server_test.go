@@ -36,6 +36,20 @@ var _ = Describe("Server", func() {
 		router = CreateRouter()
 	})
 
+	Describe("Caption Generate Algorithm", func() {
+		Describe("The getLyricsLines function", func() {
+			var lines []string
+			BeforeEach(func() {
+				lyrics := []string{"line1 for lyric1\nline2 for lyric1", "line2 for lyric2\nline2 for lyric2"}
+				lines = GetLyricsLines(lyrics)
+			})
+
+			It("Returns with Lines", func() {
+				Expect(lines).Should(ConsistOf("line1 for lyric1", "line2 for lyric1", "line2 for lyric2", "line2 for lyric2"))
+			})
+		})
+	})
+
 	Describe("Version 1 API at /api/v1", func() {
 		Describe("The / endpoint", func() {
 			BeforeEach(func() {
