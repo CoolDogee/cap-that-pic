@@ -30,7 +30,7 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
 ## Technologies Used
 - Cap That Pic uses *ReactJS* as the Frontend structural framework.
 - Backend architecture is implemented using *Golang*
-- *CircleCI* for continous integration and delivery with automated testing.
+- *CircleCI* for continuous integration and delivery with automated testing.
 - *Heroku* as a cloud platform for deployment and managing the application.
 - *Azure (Computer Vision)* API to extrate tags from user's image.
 - *MusixMatch* API to fetch lyrics corresponding to an artist.
