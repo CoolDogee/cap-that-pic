@@ -7,6 +7,7 @@ export const FileUpload = () => {
   const [filename, setFilename] = useState("Choose Image");
   const [uploadedFile, setUploadedFile] = useState({});
   const [message, setMessage] = useState("");
+  const [uploadPercentage, setUploadPercentage] = useState(0);
 
   const onChange = e => {
     setFile(e.target.files[0]);
@@ -24,6 +25,15 @@ export const FileUpload = () => {
       const res = await axios.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data"
+        },
+        onUploadProgress: progressEvent => {
+          setUploadPercentage(
+            parseInt(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            )
+          );
+          // Clear Percentage
+          setTimeout(() => setUploadPercentage(0), 10000);
         }
       });
 
@@ -35,7 +45,7 @@ export const FileUpload = () => {
       }
     } catch (err) {
       if (err.response.status === 500) {
-        setMessage("Server Error!");
+        setMessage("Internal Server Error!");
       } else {
         setMessage(err.response.data.message);
       }
