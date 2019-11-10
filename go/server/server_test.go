@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cooldogee/cap-that-pic/data"
 	. "github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -34,18 +35,18 @@ var _ = Describe("Server", func() {
 
 	BeforeEach(func() {
 		router = CreateRouter()
+		data.Reload()
 	})
 
 	Describe("Caption Generate Algorithm", func() {
-		Describe("The getLyricsLines function", func() {
+		Describe("The GetLyricsLines function", func() {
 			var lines []string
 			BeforeEach(func() {
-				lyrics := []string{"line1 for lyric1\nline2 for lyric1", "line2 for lyric2\nline2 for lyric2"}
-				lines = GetLyricsLines(lyrics)
+				lines = GetLyricsLines(data.Song(-1, 0).List[:2])
 			})
 
 			It("Returns with Lines", func() {
-				Expect(lines).Should(ConsistOf("line1 for lyric1", "line2 for lyric1", "line2 for lyric2", "line2 for lyric2"))
+				Expect(lines).Should(ContainElement("What what, what, what"))
 			})
 		})
 	})
