@@ -1,10 +1,12 @@
 import React, { Fragment, useState } from "react";
+import Message from "./Message";
 import axios from "axios";
 
 export const FileUpload = () => {
   const [file, setFile] = useState("");
-  const [filename, setFilename] = useState("Choose File");
+  const [filename, setFilename] = useState("Choose Image");
   const [uploadedFile, setUploadedFile] = useState({});
+  const [message, setMessage] = useState("");
 
   const onChange = e => {
     setFile(e.target.files[0]);
@@ -15,6 +17,8 @@ export const FileUpload = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("file", file);
+
+    // TODO: Check of the uploaded file is a image. Aloow only .png or .jpeg
 
     try {
       const res = await axios.post("/upload", formData, {
@@ -27,17 +31,19 @@ export const FileUpload = () => {
       if (res.status === 200) {
         console.log("Image successfully uploaded");
         setUploadedFile({ fileName, filePath });
+        setMessage("File Successfully Uploaded!");
       }
     } catch (err) {
       if (err.response.status === 500) {
-        console.log("Server Error!");
+        setMessage("Server Error!");
       } else {
-        console.log("err.response.data.message");
+        setMessage(err.response.data.message);
       }
     }
   };
   return (
     <Fragment>
+      {message ? <Message msg={message} /> : null}
       <form onSubmit={onSubmit}>
         <div className="custom-file mb-4">
           <input
