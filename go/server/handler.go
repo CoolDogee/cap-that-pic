@@ -11,7 +11,7 @@ func hello(c *gin.Context) {
 	c.String(200, "Hello World")
 }
 
-func GenerateCaption(songs []models.Song, tags []string) string {
+func GenerateCaption(songs []models.Song, tags []models.Tag) string {
 	return " "
 }
 

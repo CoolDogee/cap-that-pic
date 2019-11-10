@@ -9,6 +9,7 @@ import (
 
 var (
 	song models.SongList
+	tag  models.TagList
 	box  = packr.New("lyrics", "../../lyrics/")
 )
 
@@ -22,7 +23,9 @@ func loadFile(name string) []byte {
 
 func Reload() {
 	song = *new(models.SongList)
+	tag = *new(models.TagList)
 	json.Unmarshal(loadFile("lyrics.json"), &song)
+	json.Unmarshal(loadFile("tags.json"), &tag)
 }
 
 func Song(limit int, offset int) *models.SongList {
@@ -38,6 +41,23 @@ func Song(limit int, offset int) *models.SongList {
 			end = len(song.List)
 		}
 		tmp.List = song.List[offset : offset+limit]
+		return &tmp
+	}
+}
+
+func Tag(limit int, offset int) *models.TagList {
+	if limit == -1 {
+		return &tag
+	} else {
+		var tmp models.TagList
+		end := offset + limit + 1
+		if offset >= len(tag.List) {
+			return nil
+		}
+		if end > len(tag.List) {
+			end = len(tag.List)
+		}
+		tmp.List = tag.List[offset : offset+limit]
 		return &tmp
 	}
 }
