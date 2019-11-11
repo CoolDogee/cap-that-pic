@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -16,7 +17,6 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 )
 
-<<<<<<< Updated upstream
 type Image struct {
 	URL string
 }
@@ -24,9 +24,8 @@ type Image struct {
 type Caption struct {
 	Content string
 }
-=======
+
 var computerVisionContext context.Context
->>>>>>> Stashed changes
 
 func hello(c *gin.Context) {
 	c.String(200, "Hello World")
@@ -141,7 +140,17 @@ func getTagsFromImage(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	localImagePath := baseDir + "/../client/public/uploads/test.png"
+
+	files, err := ioutil.ReadDir("./../client/public/uploads")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var imgName string
+	for _, f := range files {
+		imgName = f.Name()
+	}
+
+	localImagePath := baseDir + "/../client/public/uploads/" + imgName
 
 	c.JSON(200, TagLocalImage(computerVisionClient, localImagePath))
 
