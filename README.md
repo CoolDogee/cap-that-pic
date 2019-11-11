@@ -13,7 +13,6 @@ Just think how many times you struggle coming up with good captions for you imag
 ## How do you use it?
 
 > Cap That Pic application supports two image input method i:e upload from your local computer or enter an online (web) image URL.
-
 1. User uploads the image from local computer by clicking on _Upload Image_ or enter an online (web) image URL in the 'Enter Image URL' input box.
 2. Then click on CapThatPic to generate the caption that best matches your image. Yayy <3
 3. You can then share your image to Instagram or Facebook with the generated caption using the _Facebook Share_ or _Instagram Share_ button.
