@@ -18,6 +18,7 @@ func getCaption(c *gin.Context) {
 	c.String(200, GenerateCaption(&songs, &tags))
 }
 
+//GenerateCaption function generates caption from song list and tag list
 func GenerateCaption(songs *[]models.Song, tags *[]models.Tag) string {
 	lines := GetLyricsLines(songs)
 	linePoints := CalculatePoint(&lines, tags)
@@ -32,6 +33,7 @@ func GenerateCaption(songs *[]models.Song, tags *[]models.Tag) string {
 	return lines[indexWithOneLine]
 }
 
+//CalculatePoint function calculates points of every lines for tags
 func CalculatePoint(lines *[]string, tags *[]models.Tag) []float64 {
 	linePoints := make([]float64, len(*lines))
 	for _, tag := range *tags {
@@ -44,6 +46,7 @@ func CalculatePoint(lines *[]string, tags *[]models.Tag) []float64 {
 	return linePoints
 }
 
+//GetListMaxValue function gets max value and its index from a float64 list
 func GetListMaxValue(vals *[]float64) (int, float64) {
 	var resIndex int
 	var resVal float64
@@ -57,6 +60,7 @@ func GetListMaxValue(vals *[]float64) (int, float64) {
 	return resIndex, resVal
 }
 
+//GetListMaxValueinTwoLines function gets max two lines' value and the first line's index from a float64 list
 func GetListMaxValueinTwoLines(vals *[]float64) (int, float64) {
 	var resIndex int
 	var resVal float64
@@ -70,6 +74,7 @@ func GetListMaxValueinTwoLines(vals *[]float64) (int, float64) {
 	return resIndex, resVal
 }
 
+//GetLyricsLines function gets lines from song list
 func GetLyricsLines(songs *[]models.Song) []string {
 	var allLines []string
 	var res []string

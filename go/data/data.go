@@ -29,7 +29,6 @@ func loadFile(name string, box *packr.Box) []byte {
 func init() {
 	Reload()
 	client = db.ConnectToDB()
-
 }
 
 func Reload() {
