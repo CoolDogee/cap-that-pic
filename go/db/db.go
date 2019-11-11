@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"time"
 
@@ -20,7 +21,10 @@ import (
 // ConnectToDB makes connection with database
 func ConnectToDB() *mongo.Client {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb+srv://an_chou:59cCdK$Q5MKSMMu@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority")
+	username := os.Getenv("MONGODB_USERNAME")
+	password := os.Getenv("MONGODB_PASSWORD")
+	fmt.Println("username: ", username, " password: ", password)
+	clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
