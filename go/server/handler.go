@@ -8,14 +8,37 @@ import (
 	"strings"
 )
 
+type Image struct {
+	URL string
+}
+
+type Caption struct {
+	Content string
+}
+
 func hello(c *gin.Context) {
 	c.String(200, "Hello World")
 }
 
+//get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
-	songs := data.Song(-1, 0).List
+	var img Image
+	c.ShouldBindJSON(&img)
+	tags := getTagsOfImage(img.URL)
+	songs := getSongs(&tags)
+	var caption = Caption{Content: GenerateCaption(&songs, &tags)}
+	c.JSON(200, caption)
+}
+
+//********** Use API get tags of an image Here ***************
+func getTagsOfImage(url string) []models.Tag {
 	tags := data.Tag(-1, 0).List
-	c.String(200, GenerateCaption(&songs, &tags))
+	return tags
+}
+
+func getSongs(tags *[]models.Tag) []models.Song {
+	songs := data.Song(-1, 0).List
+	return songs
 }
 
 //GenerateCaption function generates caption from song list and tag list

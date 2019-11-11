@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cooldogee/cap-that-pic/data"
+	"github.com/cooldogee/cap-that-pic/server"
 	. "github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -81,6 +83,25 @@ var _ = Describe("Server", func() {
 
 			It("Returns the String 'Hello World'", func() {
 				Expect(response.Body.String()).To(Equal("Hello World"))
+			})
+		})
+
+		Describe("POST the /getcaption endpoint", func() {
+			BeforeEach(func() {
+				var img = server.Image{URL: "aaaa"}
+				request, _ := json.Marshal(img)
+				response = performRequestBuf(router, "POST", "/api/v1/getcaption", request)
+			})
+
+			It("Returns with Status 200", func() {
+				Expect(response.Code).To(Equal(200))
+			})
+
+			It("Returns with caption", func() {
+				var actual, expect server.Caption
+				json.Unmarshal(response.Body.Bytes(), &actual)
+				expect.Content = "I'm a hot air balloon that could go to space"
+				Expect(actual).Should(Equal(expect))
 			})
 		})
 	})
