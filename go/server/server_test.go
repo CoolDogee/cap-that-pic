@@ -63,7 +63,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("Returns with caption", func() {
-				Expect(caption).Should(Equal("Getting drunk on a train track"))
+				Expect(caption).Should(Equal("I'm a hot air balloon that could go to space"))
 			})
 		})
 

@@ -23,6 +23,9 @@ func GenerateCaption(songs *[]models.Song, tags *[]models.Tag) string {
 	linePoints := CalculatePoint(&lines, tags)
 	indexWithOneLine, valWithOneLine := GetListMaxValue(&linePoints)
 	indexWithTwoLines, valWithTwoLines := GetListMaxValueinTwoLines(&linePoints)
+	if indexWithOneLine == 0 {
+		return lines[0]
+	}
 	if valWithTwoLines > valWithOneLine {
 		return lines[indexWithTwoLines] + "\n" + lines[indexWithTwoLines+1]
 	}

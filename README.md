@@ -71,4 +71,4 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
     - [x] Find a way to deploy our app on heroku.
     - [ ] Create endpoints to fetch tags from the Azure API.
     - [x] Create endpoints to fetch song lyrics from the Musixmatch API.
-    - [ ] Implement the basic algorithm to generate caption using tags and song lyrics.
+    - [x] Implement the basic algorithm to generate caption using tags and song lyrics.
