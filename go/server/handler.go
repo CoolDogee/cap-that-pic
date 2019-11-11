@@ -48,8 +48,11 @@ func GenerateCaption(songs *[]models.Song, tags *[]models.Tag) string {
 	linePoints := CalculatePoint(&lines, tags)
 	indexX, indexY, _ := GetListMaxValue(&linePoints)
 	//	indexWithTwoLines, valWithTwoLines := GetListMaxValueinTwoLines(&linePoints)
-	if indexX == 0 && indexY == 0 {
-		return lines[0][0] + "\n" + lines[0][1] + "\n" + lines[0][2]
+	if indexY == 0 {
+		return lines[indexX][0] + "\n" + lines[indexX][1] + "\n" + lines[indexX][2]
+	}
+	if indexY == len(lines[indexX])-1 {
+		return lines[indexX][indexY-2] + "\n" + lines[indexX][indexY-1] + "\n" + lines[indexX][indexY]
 	}
 	return lines[indexX][indexY-1] + "\n" + lines[indexX][indexY] + "\n" + lines[indexX][indexY+1]
 }
@@ -122,6 +125,5 @@ func GetLyricsLines(songs *[]models.Song) [][]string {
 			res = append(res, tmp)
 		}
 	}
-
 	return res
 }
