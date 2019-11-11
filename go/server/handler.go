@@ -30,6 +30,7 @@ func getCaption(c *gin.Context) {
 	c.JSON(200, caption)
 }
 
+//********** Use API get tags of an image Here ***************
 func getTagsOfImage(url string) []models.Tag {
 	tags := data.Tag(-1, 0).List
 	return tags
