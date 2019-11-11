@@ -6,5 +6,5 @@ type Tag struct {
 }
 
 type TagList struct {
-	List []Tag `json:"tag"`
+	List []Tag `json:"tags"`
 }
