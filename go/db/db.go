@@ -89,11 +89,11 @@ func AddLyricsToDB(client *mongo.Client) {
 }
 
 // GetLyricsUsingTags returns list of songs which have atleast one tag in their title
-func GetLyricsUsingTags(client *mongo.Client, tags []string) []models.Song {
+func GetLyricsUsingTags(client *mongo.Client, tags []models.Tag) []models.Song {
 	var songs []models.Song
 
 	for i := range tags {
-		songs = append(songs, GetLyricsUsingTag(client, tags[i])...)
+		songs = append(songs, GetLyricsUsingTag(client, tags[i].Name)...)
 	}
 
 	return songs

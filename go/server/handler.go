@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/cooldogee/cap-that-pic/data"
+	"github.com/cooldogee/cap-that-pic/db"
 	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/gin-gonic/gin"
 
@@ -13,8 +14,11 @@ func hello(c *gin.Context) {
 }
 
 func getCaption(c *gin.Context) {
-	songs := data.Song(-1, 0).List
+	// songs := data.Song(-1, 0).List
 	tags := data.Tag(-1, 0).List
+	client := db.ConnectToDB()
+	songs := db.GetLyricsUsingTags(client, tags)
+	db.CloseConnectionDB(client)
 	c.String(200, GenerateCaption(songs, tags))
 }
 
