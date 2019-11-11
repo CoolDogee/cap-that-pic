@@ -12,17 +12,24 @@ app.post("/upload", (req, res) => {
   }
 
   const file = req.files.file;
+  const nameSplit = file.name.split(".");
+  const imageType = nameSplit[nameSplit.length - 1];
+  const fileName = "iamcooldogee";
 
-  file.mv(`${__dirname}/client/public/uploads/${file.name}`, err => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send(err);
+  file.mv(
+    `${__dirname}/client/public/uploads/${fileName + "." + imageType}`,
+    err => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send(err);
+      }
+
+      res.status(200).json({
+        fileName: file.name,
+        filePath: `/uploads/${fileName + "." + imageType}`
+      });
     }
-
-    res
-      .status(200)
-      .json({ fileName: file.name, filePath: `/uploads/${file.name}` });
-  });
+  );
 });
 
 app.listen(5000, () => console.log("Server started on port 5000"));
