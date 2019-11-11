@@ -32,7 +32,9 @@ func getCaption(c *gin.Context) {
 	// c.JSON(200, gin.H{
 	// 	"caption": GenerateCaption(&songs, &tags),
 	// })
-	c.JSON(200, GenerateCaption(&songs, &tags))
+	var caption Caption
+	caption.Content = GenerateCaption(&songs, &tags)
+	c.JSON(200, caption)
 }
 
 //********** Use API get tags of an image Here ***************

@@ -58,7 +58,7 @@ var _ = Describe("Server", func() {
 			BeforeEach(func() {
 				var img = server.Image{URL: "aaaa"}
 				request, _ := json.Marshal(img)
-				response = performRequestBuf(router, "POST", "/api/v1/getcaption", request)
+				response = performRequestBuf(router, "GET", "/api/v1/getcaption", request)
 			})
 
 			It("Returns with Status 200", func() {
