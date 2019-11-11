@@ -38,35 +38,35 @@ var _ = Describe("Server", func() {
 		data.Reload()
 	})
 
-	Describe("Caption Generate Algorithm", func() {
-		// 	Describe("The GetLyricsLines function", func() {
-		// 		var lines []string
-		// 		BeforeEach(func() {
-		// 			lines = GetLyricsLines(data.Song(-1, 0).List[:2])
-		// 		})
-		//
-		// 		It("Returns with Lines", func() {
-		// 			Expect(lines).Should(ContainElement("What what, what, what"))
-		// 		})
-		// 	})
+	// Describe("Caption Generate Algorithm", func() {
+	// 	Describe("The GetLyricsLines function", func() {
+	// 		var lines []string
+	// 		BeforeEach(func() {
+	// 			lines = GetLyricsLines(data.Song(-1, 0).List[:2])
+	// 		})
+	//
+	// 		It("Returns with Lines", func() {
+	// 			Expect(lines).Should(ContainElement("What what, what, what"))
+	// 		})
+	// 	})
 
-		// Describe("The GenerateCaption function", func() {
-		// 	var caption string
-		// 	BeforeEach(func() {
-		// 		songs := data.Song(-1, 0).List
-		// 		tags := data.Tag(-1, 0).List
-		// 		log.Println("Len = ", len(tags))
-		// 		log.Println(tags[0].Name)
-		//
-		// 		caption = GenerateCaption(songs, tags)
-		// 	})
-		//
-		// 	It("Returns with caption", func() {
-		// 		Expect(caption).Should(Equal("Getting drunk on a train track"))
-		// 	})
-		// })
+	// Describe("The GenerateCaption function", func() {
+	// 	var caption string
+	// 	BeforeEach(func() {
+	// 		songs := data.Song(-1, 0).List
+	// 		tags := data.Tag(-1, 0).List
+	// 		log.Println("Len = ", len(tags))
+	// 		log.Println(tags[0].Name)
+	//
+	// 		caption = GenerateCaption(songs, tags)
+	// 	})
+	//
+	// 	It("Returns with caption", func() {
+	// 		Expect(caption).Should(Equal("Getting drunk on a train track"))
+	// 	})
+	// })
 
-	})
+	// })
 
 	Describe("Version 1 API at /api/v1", func() {
 		Describe("The / endpoint", func() {
@@ -82,5 +82,24 @@ var _ = Describe("Server", func() {
 				Expect(response.Body.String()).To(Equal("Hello World"))
 			})
 		})
+
+		// Describe("POST the /getcaption endpoint", func() {
+		// 	BeforeEach(func() {
+		// 		var img = server.Image{URL: "aaaa"}
+		// 		request, _ := json.Marshal(img)
+		// 		response = performRequestBuf(router, "POST", "/api/v1/getcaption", request)
+		// 	})
+		//
+		// 	It("Returns with Status 200", func() {
+		// 		Expect(response.Code).To(Equal(200))
+		// 	})
+		//
+		// 	It("Returns with caption", func() {
+		// 		var actual, expect server.Caption
+		// 		json.Unmarshal(response.Body.Bytes(), &actual)
+		// 		expect.Content = "Sunshine she's here, you can take a break\nI'm a hot air balloon that could go to space\nWith the air, like I don't care, baby, by the way"
+		// 		Expect(actual).Should(Equal(expect))
+		// 	})
+		// })
 	})
 })
