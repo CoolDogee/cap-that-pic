@@ -3,9 +3,6 @@ package data
 import (
 	"encoding/json"
 
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/cooldogee/cap-that-pic/db"
 	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/gobuffalo/packr/v2"
 )
@@ -15,7 +12,8 @@ var (
 	tag     models.TagList
 	boxSong = packr.New("lyrics", "../../lyrics/")
 	boxTag  = packr.New("tags", "../../tags/")
-	client  *mongo.Client
+
+//	client  *mongo.Client
 )
 
 func loadFile(name string, box *packr.Box) []byte {
@@ -31,8 +29,8 @@ func init() {
 }
 
 func Reload() {
-	client = db.ConnectToDB()
-	db.CloseConnectionDB(client)
+	//	client = db.ConnectToDB()
+	//	db.CloseConnectionDB(client)
 
 	song = *new(models.SongList)
 	tag = *new(models.TagList)
