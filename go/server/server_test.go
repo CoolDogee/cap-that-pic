@@ -43,7 +43,7 @@ var _ = Describe("Server", func() {
 		Describe("The GetLyricsLines function", func() {
 			var lines []string
 			BeforeEach(func() {
-				lines = GetLyricsLines(data.Song(-1, 0).List[:2])
+				lines = GetLyricsLines(&data.Song(-1, 0).List)
 			})
 
 			It("Returns with Lines", func() {
@@ -59,11 +59,11 @@ var _ = Describe("Server", func() {
 				log.Println("Len = ", len(tags))
 				log.Println(tags[0].Name)
 
-				caption = GenerateCaption(songs, tags)
+				caption = GenerateCaption(&songs, &tags)
 			})
 
 			It("Returns with caption", func() {
-				Expect(caption).Should(Equal("Getting drunk on a train track"))
+				Expect(caption).Should(Equal("I'm a hot air balloon that could go to space"))
 			})
 		})
 
