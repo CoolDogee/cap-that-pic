@@ -82,9 +82,13 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
   - [x] Create a configuration file for CircleCI to run automated tests.
   - [x] Create a pipeline to integrate frontend with the backend.
   - [x] Find a way to deploy our app on heroku.
-  - [ ] Create endpoints to fetch tags from the Azure API.
   - [x] Create endpoints to fetch song lyrics from the Musixmatch API.
   - [x] Implement the basic algorithm to generate caption using tags and song lyrics.
 - Day 2
-  - [ ] Stand-up after lunch
+  - [x] Stand-up after lunch
+  - [ ] Create endpoints to fetch tags from the Azure API or implement a client SDK.
+  - [ ] How to store images in mongodb and genarate a URL
   - [ ] Add feature to enter image URL
+  - [ ] Return 3 lines (the one containing tag and two adjacent) as caption
+  - [ ] Heroku deployment (decide whether to integrate with github or deploy as a docker container)
+  - [ ] Make endpoints to accept URLS and uploaded image and return caption as response
