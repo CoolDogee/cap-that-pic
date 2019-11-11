@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"log"
 	"net/http"
 	"net/http/httptest"
 
@@ -9,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cooldogee/cap-that-pic/data"
 	. "github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -34,6 +36,37 @@ var _ = Describe("Server", func() {
 
 	BeforeEach(func() {
 		router = CreateRouter()
+		data.Reload()
+	})
+
+	Describe("Caption Generate Algorithm", func() {
+		Describe("The GetLyricsLines function", func() {
+			var lines []string
+			BeforeEach(func() {
+				lines = GetLyricsLines(data.Song(-1, 0).List[:2])
+			})
+
+			It("Returns with Lines", func() {
+				Expect(lines).Should(ContainElement("What what, what, what"))
+			})
+		})
+
+		Describe("The GenerateCaption function", func() {
+			var caption string
+			BeforeEach(func() {
+				songs := data.Song(-1, 0).List
+				tags := data.Tag(-1, 0).List
+				log.Println("Len = ", len(tags))
+				log.Println(tags[0].Name)
+
+				caption = GenerateCaption(songs, tags)
+			})
+
+			It("Returns with caption", func() {
+				Expect(caption).Should(Equal("Getting drunk on a train track"))
+			})
+		})
+
 	})
 
 	Describe("Version 1 API at /api/v1", func() {
