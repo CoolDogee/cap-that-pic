@@ -5,6 +5,9 @@ import (
 )
 
 func main() {
+	// client := db.ConnectToDB()
+	// db.AddLyricsToDB(client)
+	// db.CloseConnectionDB(client)
 	router := server.CreateRouter()
 	server.StartServer(router)
 }
