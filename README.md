@@ -13,6 +13,7 @@ Just think how many times you struggle coming up with good captions for you imag
 ## How do you use it?
 
 > Cap That Pic application supports two image input method i:e upload from your local computer or enter an online (web) image URL.
+
 1. User uploads the image from local computer by clicking on _Upload Image_ or enter an online (web) image URL in the 'Enter Image URL' input box.
 2. Then click on CapThatPic to generate the caption that best matches your image. Yayy <3
 3. You can then share your image to Instagram or Facebook with the generated caption using the _Facebook Share_ or _Instagram Share_ button.
@@ -81,9 +82,13 @@ After extracting the tags from Azure (Computer Vision) API and lyrics from Musix
   - [x] Create a configuration file for CircleCI to run automated tests.
   - [x] Create a pipeline to integrate frontend with the backend.
   - [x] Find a way to deploy our app on heroku.
-  - [ ] Create endpoints to fetch tags from the Azure API.
   - [x] Create endpoints to fetch song lyrics from the Musixmatch API.
   - [x] Implement the basic algorithm to generate caption using tags and song lyrics.
 - Day 2
-  - [ ] Stand-up after lunch
+  - [x] Stand-up after lunch
+  - [ ] Create endpoints to fetch tags from the Azure API or implement a client SDK.
+  - [ ] How to store images in mongodb and genarate a URL
   - [ ] Add feature to enter image URL
+  - [ ] Return 3 lines (the one containing tag and two adjacent) as caption
+  - [ ] Heroku deployment (decide whether to integrate with github or deploy as a docker container)
+  - [ ] Make endpoints to accept URLS and uploaded image and return caption as response
