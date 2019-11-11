@@ -2,7 +2,7 @@ package models
 
 type Tag struct {
 	Name       string
-	confidence float64
+	Confidence float64
 }
 
 type TagList struct {

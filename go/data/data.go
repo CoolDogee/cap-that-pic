@@ -21,6 +21,10 @@ func loadFile(name string) []byte {
 	return res
 }
 
+func init() {
+	Reload()
+}
+
 func Reload() {
 	song = *new(models.SongList)
 	tag = *new(models.TagList)
