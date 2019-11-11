@@ -28,10 +28,12 @@ func loadFile(name string, box *packr.Box) []byte {
 
 func init() {
 	Reload()
-	client = db.ConnectToDB()
 }
 
 func Reload() {
+	client = db.ConnectToDB()
+	db.CloseConnectionDB(client)
+
 	song = *new(models.SongList)
 	tag = *new(models.TagList)
 	json.Unmarshal(loadFile("lyrics.json", boxSong), &song)
