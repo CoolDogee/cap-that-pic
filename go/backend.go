@@ -1,12 +1,14 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/cooldogee/cap-that-pic/server"
+	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	http.HandleFunc("/api/v1", server.hello)
-	http.HandleFunc("/api/v1/getcaption", server.getCaption)
+	router := gin.Default()
+	router.Use(static.Serve("/", static.LocalFile("./web", true)))
+	server.SetupRoutes(router)
+	router.Run()
 }

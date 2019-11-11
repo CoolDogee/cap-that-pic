@@ -19,7 +19,9 @@ func getCaption(c *gin.Context) {
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
-	c.String(200, GenerateCaption(songs, tags))
+	c.JSON(200, gin.H{
+		"caption": GenerateCaption(songs, tags),
+	})
 }
 
 func GenerateCaption(songs []models.Song, tags []models.Tag) string {
