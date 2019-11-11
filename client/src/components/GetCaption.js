@@ -13,7 +13,7 @@ class GetCaptionComponent extends Component {
         axios.get('api/v1/getcaption')
             .then((response) => {
                 this.setState(() => {
-                    return { getcaption: response.data.caption }
+                    return { getcaption: response.data }
                 })
             })
             .catch(function (error) {
