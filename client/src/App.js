@@ -1,7 +1,5 @@
 import React from "react";
-import GetCaptionComponent from "./components/GetCaption";
 import FileUpload from "./components/FileUpload";
-import GenerateCaption from "./components/GenerateCaption";
 import "./App.css";
 
 const App = () => (
@@ -9,8 +7,6 @@ const App = () => (
     <h4 className="display-4 text-center mb-4">
       <i className="fas fa-music"></i> Cap That Pic
     </h4>
-
-    <GetCaptionComponent />
     <FileUpload />
   </div>
 );
