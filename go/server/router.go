@@ -9,4 +9,6 @@ func setupRoutes(router *gin.Engine) {
 
 	v1.GET("/", hello)
 	v1.POST("/getcaption", getCaption)
+	v1.GET("/getcaption", getCaption)
+	v1.GET("/getTagsfromImage", getTagsFromImage)
 }
