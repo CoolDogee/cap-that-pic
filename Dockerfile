@@ -8,8 +8,10 @@ COPY --from=builder /app/client ./
 RUN npm install
 RUN npm run build
 
+FROM alpine:latest
 COPY --from=builder /app/go/main ./
-COPY --from=node_builder ./build ./web
+COPY --from=node_builder /build ./web
+RUN chmod +x ./main
 EXPOSE 8080
 
 CMD ./main
