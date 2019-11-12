@@ -74,7 +74,7 @@ export const FileUpload = () => {
           <input
             type="submit"
             value="Generate Caption"
-            className="btn btn-primary btn-block mt-4"
+            className="btn btn-primary btn-block mt-5 mb-5"
           />
         </form>
       ) : null}
