@@ -24,8 +24,7 @@ export const FileUpload = () => {
       const caption = res.data;
       if (res.status === 200) {
         console.log("Generated Caption Successfully");
-        console.log(res.data);
-        setCaption(caption);
+        setCaption(res.data);
       }
     } catch (err) {
       if (err.response.status === 500) {
@@ -55,6 +54,7 @@ export const FileUpload = () => {
           </div>
         </div>
       ) : null}
+      {setUrl ? <h4>{caption}</h4> : null}
       {setUrl ? (
         <form onSubmit={onSubmit}>
           <input
