@@ -10,7 +10,7 @@ class GetCaptionComponent extends Component {
     }
 
     componentWillMount() {
-        axios.get('api/v1/getcaption')
+        axios.get('api/v1/getcaption?fileName=animals.jpg')
             .then((response) => {
                 this.setState(() => {
                     return { getcaption: response.data }

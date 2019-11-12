@@ -11,6 +11,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.0.0-rc.15
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
