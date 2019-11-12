@@ -24,7 +24,7 @@ func ConnectToDB() *mongo.Client {
 	username := os.Getenv("MONGODB_USERNAME")
 	password := os.Getenv("MONGODB_PASSWORD")
 	// fmt.Println("username: ", username, " password: ", password)
-	clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMode=scram-sha1")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
