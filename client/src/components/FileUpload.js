@@ -1,17 +1,17 @@
 import React, { Fragment, useState } from "react";
 import Message from "./Message";
-import Progress from "./Progress";
 import axios from "axios";
+// import Typist from "react-typist";
 
 export const FileUpload = () => {
   const [message, setMessage] = useState("");
   const [url, setUrl] = useState("");
-  const [caption, setCaption] = useState("");
-  const [capLine, setCaplines] = useState([]);
+  const [caption, setCaption] = useState([]);
+  const [status, setStatus] = useState(false);
 
   const onChange = e => {
-    console.log(e.target.value);
     setUrl(e.target.value);
+    setStatus(true);
   };
 
   const onSubmit = async e => {
@@ -22,13 +22,9 @@ export const FileUpload = () => {
         params: { fileName: url }
       });
 
-      const caption = res.data;
       if (res.status === 200) {
-        console.log("Generated Caption Successfully");
         const capLines = res.data.split("\n");
-        console.log(capLines);
-        setCaplines(capLines);
-        setCaption(res.data);
+        setCaption(capLines);
       }
     } catch (err) {
       if (err.response.status === 500) {
@@ -41,11 +37,12 @@ export const FileUpload = () => {
 
   return (
     <Fragment>
+      {message ? <Message msg={message} /> : null}
       <div className="custom-file mb-4">
         <label>Enter Image URL</label>
         <input
           type="text"
-          class="form-control"
+          className="form-control"
           id="exampleFormControlInput1"
           placeholder="Enter Image URL"
           onChange={onChange}
@@ -54,20 +51,25 @@ export const FileUpload = () => {
       {setUrl ? (
         <div className="row mt-5">
           <div className="col-md-6 m-auto">
-            <img style={{ width: "100%" }} src={url} alt="" />
+            <img
+              style={{ width: "100%" }}
+              src={url}
+              className="img-fluid"
+              alt=""
+            />
           </div>
         </div>
       ) : null}
       {setUrl ? (
         <div className="row mt-5 mb-5">
           <div className="col-lg-8 m-auto">
-            <h4>{capLine[0]}</h4>
-            <h4>{capLine[1]}</h4>
-            <h4>{capLine[2]}</h4>
+            <h4>{caption[0]}</h4>
+            <h4>{caption[1]}</h4>
+            <h4>{caption[2]}</h4>
           </div>
         </div>
       ) : null}
-      {setUrl ? (
+      {status ? (
         <form onSubmit={onSubmit}>
           <input
             type="submit"
