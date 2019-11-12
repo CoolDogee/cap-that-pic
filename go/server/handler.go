@@ -40,6 +40,7 @@ func getCaption(c *gin.Context) {
 	fmt.Println(img)
 	// tags := GetTagsFromImage(img)
 	tags := GetTagFromRemoteImage(img)
+	fmt.Println("Tags are working!")
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
