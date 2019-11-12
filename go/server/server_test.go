@@ -54,11 +54,9 @@ var _ = Describe("Server", func() {
 			})
 		})
 
-		Describe("GET the /getcaption endpoint", func() {
+		Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
 			BeforeEach(func() {
-				var img = server.Image{URL: "aaaa"}
-				request, _ := json.Marshal(img)
-				response = performRequestBuf(router, "GET", "/api/v1/getcaption", request)
+				response = performRequest(router, "GET", "/api/v1/getcaption?fileName=animals.jpg")
 			})
 
 			It("Returns with Status 200", func() {
@@ -66,9 +64,9 @@ var _ = Describe("Server", func() {
 			})
 
 			It("Returns with caption", func() {
-				var actual, expect server.Caption
+				var actual, expect string
 				json.Unmarshal(response.Body.Bytes(), &actual)
-				expect.Content = "Sunshine she's here, you can take a break\nI'm a hot air balloon that could go to space\nWith the air, like I don't care, baby, by the way"
+				expect = "Yeah they took turns laying a rose down\nThrew a handful of dirt into the deep ground\nHe’s not the only one who had a secret to hide"
 				Expect(actual).Should(Equal(expect))
 			})
 		})

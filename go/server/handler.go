@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/joho/godotenv"
 )
 
 type Image struct {
@@ -34,18 +36,16 @@ func hello(c *gin.Context) {
 
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
-	// var img Image
-	// c.ShouldBindJSON(&img)
-	tags := getTagsOfImage("imgURL")
+	img := c.Request.URL.Query().Get("fileName")
+	fmt.Println(img)
+	tags := GetTagsFromImage(img)
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
-	// c.JSON(200, gin.H{
-	// 	"caption": GenerateCaption(&songs, &tags),
-	// })
+
 	var caption Caption
 	caption.Content = GenerateCaption(&songs, &tags)
-	c.JSON(200, caption)
+	c.JSON(200, caption.Content)
 }
 
 //********** Use API get tags of an image Here ***************
@@ -110,20 +110,6 @@ func GetListMaxValue(vals *[][]float64) (int, int, float64) {
 	return resIndexX, resIndexY, resVal
 }
 
-// //GetListMaxValueinTwoLines function gets max two lines' value and the first line's index from a float64 list
-// func GetListMaxValueinTwoLines(vals *[]float64) (int, float64) {
-// 	var resIndex int
-// 	var resVal float64
-// 	resVal = 0
-// 	for index, val := range (*vals)[:len(*vals)-1] {
-// 		if val+(*vals)[index+1] >= resVal {
-// 			resVal = val
-// 			resIndex = index
-// 		}
-// 	}
-// 	return resIndex, resVal
-// }
-
 //GetLyricsLines function gets lines from song list
 func GetLyricsLines(songs *[]models.Song) [][]string {
 	allLines := make([][]string, len(*songs))
@@ -146,9 +132,14 @@ func GetLyricsLines(songs *[]models.Song) [][]string {
 	return res
 }
 
+// getTagsFromImage for /getTagsfromImage endpoint
 func getTagsFromImage(c *gin.Context) {
-	computerVisionKey := "d22d77ee1a7441ba8d5992299589a823"
-	endpointURL := "https://coolorg.cognitiveservices.azure.com/"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	computerVisionKey := os.Getenv("computerVisionKey")
+	endpointURL := os.Getenv("endpointURL")
 
 	computerVisionClient := computervision.New(endpointURL)
 	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
@@ -172,10 +163,35 @@ func getTagsFromImage(c *gin.Context) {
 		imgName = f.Name()
 	}
 
+	imgName = "animals.jpg"
+
 	localImagePath := baseDir + "/../client/public/uploads/" + imgName
 
 	c.JSON(200, TagLocalImage(computerVisionClient, localImagePath))
+}
 
+// GetTagsFromImage return tags for an image
+// Utility function for getCaption
+func GetTagsFromImage(img string) []models.Tag {
+	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
+	endpointURL := os.Getenv("ENDPOINT_URL")
+
+	computerVisionClient := computervision.New(endpointURL)
+	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
+
+	computerVisionContext = context.Background()
+
+	// Analyze a local image
+
+	baseDir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	localImagePath := baseDir + "/../client/public/uploads/" + img
+	fmt.Println(localImagePath)
+	return TagLocalImage(computerVisionClient, localImagePath)
 }
 
 func TagLocalImage(client computervision.BaseClient, localImagePath string) []models.Tag {
