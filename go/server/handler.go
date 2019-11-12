@@ -38,7 +38,8 @@ func hello(c *gin.Context) {
 func getCaption(c *gin.Context) {
 	img := c.Request.URL.Query().Get("fileName")
 	fmt.Println(img)
-	tags := GetTagsFromImage(img)
+	// tags := GetTagsFromImage(img)
+	tags := GetTagFromRemoteImage(img)
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
@@ -46,6 +47,36 @@ func getCaption(c *gin.Context) {
 	var caption Caption
 	caption.Content = GenerateCaption(&songs, &tags)
 	c.JSON(200, caption.Content)
+}
+
+func GetTagFromRemoteImage(remoteImgUrl string) []models.Tag {
+	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
+	endpointURL := os.Getenv("ENDPOINT_URL")
+
+	computerVisionClient := computervision.New(endpointURL)
+	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
+
+	computerVisionContext = context.Background()
+
+	return TagRemoteImage(computerVisionClient, remoteImgUrl)
+}
+
+func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) []models.Tag {
+	var remoteImage computervision.ImageURL
+	remoteImage.URL = &remoteImageURL
+	remoteImageTags, err := client.TagImage(
+		computerVisionContext,
+		remoteImage,
+		"")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var tags []models.Tag
+	for _, caption := range *remoteImageTags.Tags {
+		tag := models.Tag{*caption.Name, *caption.Confidence * 100}
+		tags = append(tags, tag)
+	}
+	return tags
 }
 
 //********** Use API get tags of an image Here ***************
