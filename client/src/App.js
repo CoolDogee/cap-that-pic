@@ -1,6 +1,7 @@
 import React from "react";
-import GetCaptionComponent from './components/GetCaption';
+import GetCaptionComponent from "./components/GetCaption";
 import FileUpload from "./components/FileUpload";
+import GenerateCaption from "./components/GenerateCaption";
 import "./App.css";
 
 const App = () => (

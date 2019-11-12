@@ -6,9 +6,11 @@ import axios from "axios";
 export const FileUpload = () => {
   const [file, setFile] = useState("");
   const [filename, setFilename] = useState("Choose Image");
+  const [fileType, setFileType] = useState("");
   const [uploadedFile, setUploadedFile] = useState({});
   const [message, setMessage] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
+  const [caption, setCaption] = useState("");
 
   const onChange = e => {
     setFile(e.target.files[0]);
@@ -52,6 +54,31 @@ export const FileUpload = () => {
       }
     }
   };
+
+  const onSubmit2 = async e => {
+    e.preventDefault();
+    const nameSplit = uploadedFile.fileName.split(".");
+    const imageType = nameSplit[nameSplit.length - 1];
+
+    try {
+      const res = await axios.get("/api/v1/getcaption", {
+        params: { fileName: "iamcooldogee" + "." + imageType }
+      });
+
+      const caption = res.data;
+      if (res.status === 200) {
+        console.log("Generated Caption Successfully");
+        setCaption(caption);
+      }
+    } catch (err) {
+      if (err.response.status === 500) {
+        setMessage("Internal Server Error!");
+      } else {
+        setMessage(err.response.data.message);
+      }
+    }
+  };
+
   return (
     <Fragment>
       {message ? <Message msg={message} /> : null}
@@ -83,6 +110,22 @@ export const FileUpload = () => {
             <img style={{ width: "100%" }} src={uploadedFile.filePath} alt="" />
           </div>
         </div>
+      ) : null}
+      {caption ? (
+        <div className="row mt-5">
+          <div className="col-md-6 m-auto">
+            <h3 className="text-center">{caption}</h3>
+          </div>
+        </div>
+      ) : null}
+      {uploadedFile ? (
+        <form onSubmit={onSubmit2}>
+          <input
+            type="submit"
+            value="Generate Caption"
+            className="btn btn-primary btn-block mt-4"
+          />
+        </form>
       ) : null}
     </Fragment>
   );
