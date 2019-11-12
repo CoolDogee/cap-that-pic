@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/cooldogee/cap-that-pic/data"
+	"github.com/cooldogee/cap-that-pic/db"
 	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/gin-gonic/gin"
 
@@ -33,11 +34,17 @@ func hello(c *gin.Context) {
 
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
-	var img Image
-	c.ShouldBindJSON(&img)
-	tags := getTagsOfImage(img.URL)
-	songs := getLyricsFromTags(&tags)
-	var caption = Caption{Content: GenerateCaption(&songs, &tags)}
+	// var img Image
+	// c.ShouldBindJSON(&img)
+	tags := getTagsOfImage("imgURL")
+	client := db.ConnectToDB()
+	songs := db.GetLyricsUsingTags(client, tags)
+	db.CloseConnectionDB(client)
+	// c.JSON(200, gin.H{
+	// 	"caption": GenerateCaption(&songs, &tags),
+	// })
+	var caption Caption
+	caption.Content = GenerateCaption(&songs, &tags)
 	c.JSON(200, caption)
 }
 

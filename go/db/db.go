@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"time"
 
 	"github.com/cooldogee/cap-that-pic/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,7 +21,10 @@ import (
 // ConnectToDB makes connection with database
 func ConnectToDB() *mongo.Client {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb+srv://an_chou:59cCdK$Q5MKSMMu@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority")
+	username := os.Getenv("MONGODB_USERNAME")
+	password := os.Getenv("MONGODB_PASSWORD")
+	// fmt.Println("username: ", username, " password: ", password)
+	clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -85,4 +90,45 @@ func AddLyricsToDB(client *mongo.Client) {
 			fmt.Println("InsertOne() API result:", result)
 		}
 	}
+}
+
+// GetLyricsUsingTags returns list of songs which have atleast one tag in their title
+func GetLyricsUsingTags(client *mongo.Client, tags []models.Tag) []models.Song {
+	var songs []models.Song
+
+	for i := range tags {
+		songs = append(songs, GetLyricsUsingTag(client, tags[i].Name)...)
+	}
+
+	return songs
+}
+
+// GetLyricsUsingTag return list opf songs which have tag in their title
+func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
+	var songs []models.Song
+
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	collection := client.Database("CAP-THAT-PIC").Collection("Lyrics")
+
+	filter := bson.D{{"lyrics", primitive.Regex{Pattern: tag, Options: ""}}}
+	cursor, err := collection.Find(ctx, filter)
+
+	if err != nil {
+		fmt.Println("Find ERROR:", err)
+		defer cursor.Close(ctx)
+	} else {
+		fmt.Println("Find() API result:", cursor)
+		for cursor.Next(ctx) {
+			var result models.Song
+			err = cursor.Decode(&result)
+
+			if err != nil {
+				fmt.Println("cursor.Next() error: ", err)
+			} else {
+				songs = append(songs, result)
+			}
+		}
+	}
+
+	return songs
 }
