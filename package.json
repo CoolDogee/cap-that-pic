@@ -1,0 +1,31 @@
+{
+  "name": "cap-that-pic",
+  "version": "1.0.0",
+  "description": "--- *Cap That Pic* generates suitable captions for your images. It uses the technology of Microsoft Azure's Computer Vision and MusixMatch API to generate intelligent and artistic captions that best describe a users image. Give it a try ;)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoolDogee/cap-that-pic.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CoolDogee/cap-that-pic/issues"
+  },
+  "homepage": "https://github.com/CoolDogee/cap-that-pic#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6-alpha.6"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.0",
+    "nodemon": "^1.19.4"
+  }
+}
