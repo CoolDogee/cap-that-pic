@@ -38,6 +38,7 @@ func hello(c *gin.Context) {
 func getCaption(c *gin.Context) {
 	img := c.Request.URL.Query().Get("fileName")
 	tags := GetTagFromRemoteImage(img)
+	fmt.Println("Tags are working!")
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)

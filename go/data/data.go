@@ -25,7 +25,7 @@ func loadFile(name string, box *packr.Box) []byte {
 }
 
 func init() {
-	Reload()
+	//	Reload()
 }
 
 func Reload() {
