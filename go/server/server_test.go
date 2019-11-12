@@ -43,13 +43,14 @@ var _ = Describe("Server", func() {
 
 	Describe("Caption Generate Algorithm", func() {
 		Describe("The GetLyricsLines function", func() {
-			var lines []string
+			var lines [][]string
 			BeforeEach(func() {
 				lines = GetLyricsLines(&data.Song(-1, 0).List)
 			})
 
 			It("Returns with Lines", func() {
-				Expect(lines).Should(ContainElement("What what, what, what"))
+				//		log.Println(lines)
+				Expect(lines[0]).Should(ContainElement("What what, what, what"))
 			})
 		})
 
@@ -65,7 +66,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("Returns with caption", func() {
-				Expect(caption).Should(Equal("I'm a hot air balloon that could go to space"))
+				Expect(caption).Should(Equal("Sunshine she's here, you can take a break\nI'm a hot air balloon that could go to space\nWith the air, like I don't care, baby, by the way"))
 			})
 		})
 
@@ -100,7 +101,7 @@ var _ = Describe("Server", func() {
 			It("Returns with caption", func() {
 				var actual, expect server.Caption
 				json.Unmarshal(response.Body.Bytes(), &actual)
-				expect.Content = "I'm a hot air balloon that could go to space"
+				expect.Content = "Sunshine she's here, you can take a break\nI'm a hot air balloon that could go to space\nWith the air, like I don't care, baby, by the way"
 				Expect(actual).Should(Equal(expect))
 			})
 		})
