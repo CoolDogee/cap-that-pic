@@ -21,7 +21,7 @@ func CreateRouter() *gin.Engine {
 // StartServer starts given server, supporting graceful shutdown of the server
 func StartServer(router *gin.Engine) {
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":5000",
 		Handler: router,
 	}
 
