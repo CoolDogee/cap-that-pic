@@ -9,7 +9,7 @@ RUN npm install
 RUN npm run build
 
 COPY --from=builder /app/go/main ./
-COPY --from=node_builder /build ./web
+COPY --from=node_builder ./build ./web
 EXPOSE 8080
 
 CMD ./main
