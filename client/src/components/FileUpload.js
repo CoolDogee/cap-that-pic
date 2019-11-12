@@ -7,6 +7,7 @@ export const FileUpload = () => {
   const [message, setMessage] = useState("");
   const [url, setUrl] = useState("");
   const [caption, setCaption] = useState("");
+  const [capLine, setCaplines] = useState([]);
 
   const onChange = e => {
     console.log(e.target.value);
@@ -24,6 +25,9 @@ export const FileUpload = () => {
       const caption = res.data;
       if (res.status === 200) {
         console.log("Generated Caption Successfully");
+        const capLines = res.data.split("\n");
+        console.log(capLines);
+        setCaplines(capLines);
         setCaption(res.data);
       }
     } catch (err) {
@@ -38,7 +42,7 @@ export const FileUpload = () => {
   return (
     <Fragment>
       <div className="custom-file mb-4">
-        <label>Enter image URL</label>
+        <label>Enter Image URL</label>
         <input
           type="text"
           class="form-control"
@@ -54,7 +58,15 @@ export const FileUpload = () => {
           </div>
         </div>
       ) : null}
-      {setUrl ? <h4>{caption}</h4> : null}
+      {setUrl ? (
+        <div className="row mt-5 mb-5">
+          <div className="col-lg-8 m-auto">
+            <h4>{capLine[0]}</h4>
+            <h4>{capLine[1]}</h4>
+            <h4>{capLine[2]}</h4>
+          </div>
+        </div>
+      ) : null}
       {setUrl ? (
         <form onSubmit={onSubmit}>
           <input
