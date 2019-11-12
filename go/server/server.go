@@ -20,7 +20,8 @@ func CreateRouter() *gin.Engine {
 
 // StartServer starts given server, supporting graceful shutdown of the server
 func StartServer(router *gin.Engine) {
-	port := os.Getenv("PORT")
+	//	port := os.Getenv("PORT")
+	port := ""
 	if port == "" {
 		port = "8080"
 	}
