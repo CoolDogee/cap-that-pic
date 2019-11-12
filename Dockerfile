@@ -4,5 +4,5 @@ RUN mkdir /app
 ADD . /app
 WORKDIR /app/go/
 RUN go build -o main .
-CMD ["/app/go/main"]
+#CMD ["/app/go/main"]
 CMD ./main
