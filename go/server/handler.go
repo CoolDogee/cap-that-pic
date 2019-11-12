@@ -37,8 +37,6 @@ func hello(c *gin.Context) {
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
 	img := c.Request.URL.Query().Get("fileName")
-	fmt.Println(img)
-	// tags := GetTagsFromImage(img)
 	tags := GetTagFromRemoteImage(img)
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
