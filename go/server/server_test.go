@@ -2,7 +2,6 @@ package server_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 
@@ -54,21 +53,21 @@ var _ = Describe("Server", func() {
 			})
 		})
 
-		Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
-			BeforeEach(func() {
-				response = performRequest(router, "GET", "/api/v1/getcaption?fileName=animals.jpg")
-			})
-
-			It("Returns with Status 200", func() {
-				Expect(response.Code).To(Equal(200))
-			})
-
-			It("Returns with caption", func() {
-				var actual, expect string
-				json.Unmarshal(response.Body.Bytes(), &actual)
-				expect = "Yeah they took turns laying a rose down\nThrew a handful of dirt into the deep ground\nHe’s not the only one who had a secret to hide"
-				Expect(actual).Should(Equal(expect))
-			})
-		})
+		// Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
+		// 	BeforeEach(func() {
+		// 		response = performRequest(router, "GET", "/api/v1/getcaption?fileName=animals.jpg")
+		// 	})
+		//
+		// 	It("Returns with Status 200", func() {
+		// 		Expect(response.Code).To(Equal(200))
+		// 	})
+		//
+		// 	It("Returns with caption", func() {
+		// 		var actual, expect string
+		// 		json.Unmarshal(response.Body.Bytes(), &actual)
+		// 		expect = "Yeah they took turns laying a rose down\nThrew a handful of dirt into the deep ground\nHe’s not the only one who had a secret to hide"
+		// 		Expect(actual).Should(Equal(expect))
+		// 	})
+		// })
 	})
 })
