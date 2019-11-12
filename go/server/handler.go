@@ -1,11 +1,21 @@
 package server
 
 import (
+	"context"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+
 	"github.com/cooldogee/cap-that-pic/data"
+	"github.com/cooldogee/cap-that-pic/db"
 	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/gin-gonic/gin"
 
 	"strings"
+
+	"github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
+	"github.com/Azure/go-autorest/autorest"
 )
 
 type Image struct {
@@ -16,17 +26,25 @@ type Caption struct {
 	Content string
 }
 
+var computerVisionContext context.Context
+
 func hello(c *gin.Context) {
 	c.String(200, "Hello World")
 }
 
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
-	var img Image
-	c.ShouldBindJSON(&img)
-	tags := getTagsOfImage(img.URL)
-	songs := getLyricsFromTags(&tags)
-	var caption = Caption{Content: GenerateCaption(&songs, &tags)}
+	// var img Image
+	// c.ShouldBindJSON(&img)
+	tags := getTagsOfImage("imgURL")
+	client := db.ConnectToDB()
+	songs := db.GetLyricsUsingTags(client, tags)
+	db.CloseConnectionDB(client)
+	// c.JSON(200, gin.H{
+	// 	"caption": GenerateCaption(&songs, &tags),
+	// })
+	var caption Caption
+	caption.Content = GenerateCaption(&songs, &tags)
 	c.JSON(200, caption)
 }
 
@@ -126,4 +144,60 @@ func GetLyricsLines(songs *[]models.Song) [][]string {
 		}
 	}
 	return res
+}
+
+func getTagsFromImage(c *gin.Context) {
+	computerVisionKey := "d22d77ee1a7441ba8d5992299589a823"
+	endpointURL := "https://coolorg.cognitiveservices.azure.com/"
+
+	computerVisionClient := computervision.New(endpointURL)
+	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
+
+	computerVisionContext = context.Background()
+
+	// Analyze a local image
+
+	baseDir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	files, err := ioutil.ReadDir("./../client/public/uploads")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var imgName string
+	for _, f := range files {
+		imgName = f.Name()
+	}
+
+	localImagePath := baseDir + "/../client/public/uploads/" + imgName
+
+	c.JSON(200, TagLocalImage(computerVisionClient, localImagePath))
+
+}
+
+func TagLocalImage(client computervision.BaseClient, localImagePath string) []models.Tag {
+	var localImage io.ReadCloser
+	localImage, err := os.Open(localImagePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	localImageTags, err := client.TagImageInStream(
+		computerVisionContext,
+		localImage,
+		"")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tags []models.Tag
+
+	for _, caption := range *localImageTags.Tags {
+		tag := models.Tag{*caption.Name, *caption.Confidence * 100}
+		tags = append(tags, tag)
+	}
+	return tags
 }

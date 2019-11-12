@@ -14,7 +14,7 @@ import (
 // CreateRouter creates and configures a server
 func CreateRouter() *gin.Engine {
 	router := gin.Default()
-	setupRoutes(router)
+	SetupRoutes(router)
 	return router
 }
 

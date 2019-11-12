@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func setupRoutes(router *gin.Engine) {
+func SetupRoutes(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 
 	v1.GET("/", hello)
 	v1.POST("/getcaption", getCaption)
+	v1.GET("/getcaption", getCaption)
+	v1.GET("/getTagsfromImage", getTagsFromImage)
 }
