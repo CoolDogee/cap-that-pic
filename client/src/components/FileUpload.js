@@ -69,13 +69,15 @@ export const FileUpload = () => {
         </div>
       ) : null}
       {status ? (
-        <form onSubmit={onSubmit}>
-          <input
-            type="submit"
-            value="Generate Caption"
-            className="btn btn-primary btn-block mt-5 mb-5"
-          />
-        </form>
+        <div className="mt-5 mb-5 text-center">
+          <form onSubmit={onSubmit}>
+            <input
+              type="submit"
+              value="Generate Caption"
+              className="btn btn-secondary btn-lg"
+            />
+          </form>
+        </div>
       ) : null}
     </Fragment>
   );
