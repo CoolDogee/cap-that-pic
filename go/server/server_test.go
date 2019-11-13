@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 
@@ -53,21 +54,21 @@ var _ = Describe("Server", func() {
 			})
 		})
 
-		// Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
-		// 	BeforeEach(func() {
-		// 		response = performRequest(router, "GET", "/api/v1/getcaption?fileName=animals.jpg")
-		// 	})
-		//
-		// 	It("Returns with Status 200", func() {
-		// 		Expect(response.Code).To(Equal(200))
-		// 	})
-		//
-		// 	It("Returns with caption", func() {
-		// 		var actual, expect string
-		// 		json.Unmarshal(response.Body.Bytes(), &actual)
-		// 		expect = "Yeah they took turns laying a rose down\nThrew a handful of dirt into the deep ground\nHe’s not the only one who had a secret to hide"
-		// 		Expect(actual).Should(Equal(expect))
-		// 	})
-		// })
+		Describe("GET the /getcaption?fileName=ImgUrl endpoint", func() {
+			BeforeEach(func() {
+				response = performRequest(router, "GET", "/api/v1/getcaption?fileName=https://wisconsinskydivingcenter.com/wp-content/uploads/2018/08/skydiving-lessons-1200x641.jpg")
+			})
+
+			It("Returns with Status 200", func() {
+				Expect(response.Code).To(Equal(200))
+			})
+
+			It("Returns with caption", func() {
+				var actual, expect string
+				json.Unmarshal(response.Body.Bytes(), &actual)
+				expect = "I done paid taxes, paid dues, paid bills my whole life\nSo I'ma throw money in the air, like I'm tryin' to pay the sky\nTold myself that man if I can't live like this, I'd rather die"
+				Expect(actual).Should(Equal(expect))
+			})
+		})
 	})
 })
