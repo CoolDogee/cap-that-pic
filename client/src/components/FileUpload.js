@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import Message from "./Message";
+import Loading from "./Loading";
 import axios from "axios";
 // import Typist from "react-typist";
 
@@ -8,14 +9,18 @@ export const FileUpload = () => {
   const [url, setUrl] = useState("");
   const [caption, setCaption] = useState([]);
   const [status, setStatus] = useState(false);
+  const [secstatus, setSecStatus] = useState(false);
+  const [tristatus, setTriStatus] = useState(false);
 
   const onChange = e => {
     setUrl(e.target.value);
     setStatus(true);
+    setTriStatus(false);
   };
 
   const onSubmit = async e => {
     e.preventDefault();
+    setSecStatus(true);
 
     try {
       const res = await axios.get("/api/v1/getcaption", {
@@ -25,6 +30,8 @@ export const FileUpload = () => {
       if (res.status === 200) {
         const capLines = res.data.split("\n");
         setCaption(capLines);
+        setSecStatus(false);
+        setTriStatus(true);
       }
     } catch (err) {
       if (err.response.status === 500) {
@@ -49,9 +56,9 @@ export const FileUpload = () => {
       </div>
       {setUrl ? (
         <div className="row mt-5">
-          <div className="col-md-6 m-auto text-center">
+          <div className="col-md-6 m-auto">
             <img
-              style={{ width: "70%" }}
+              style={{ width: "100%" }}
               src={url}
               className="img-fluid"
               alt=""
@@ -59,7 +66,8 @@ export const FileUpload = () => {
           </div>
         </div>
       ) : null}
-      {setUrl ? (
+      {secstatus ? <Loading /> : null}
+      {tristatus ? (
         <div className="row mt-5 mb-5">
           <div className="col-md-8 m-auto text-center">
             <h4>{caption[0]}</h4>
@@ -69,7 +77,10 @@ export const FileUpload = () => {
         </div>
       ) : null}
       {status ? (
-        <div className="mt-5 mb-5 text-center">
+        <div
+          className="mt-5 mb-5 text-center"
+          style={{ paddingBottom: "100px" }}
+        >
           <form onSubmit={onSubmit}>
             <input
               type="submit"
