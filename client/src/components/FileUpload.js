@@ -49,9 +49,9 @@ export const FileUpload = () => {
       </div>
       {setUrl ? (
         <div className="row mt-5">
-          <div className="col-md-6 m-auto">
+          <div className="col-md-6 m-auto text-center">
             <img
-              style={{ width: "100%" }}
+              style={{ width: "70%" }}
               src={url}
               className="img-fluid"
               alt=""
