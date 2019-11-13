@@ -11,6 +11,7 @@ const App = () => (
     <h4 className="text-center mb-4">
       <Typist> Every Picture Deserves The Perfect Caption</Typist>
     </h4>
+    <hr></hr>
     <FileUpload />
   </div>
 );

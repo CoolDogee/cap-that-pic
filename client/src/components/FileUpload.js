@@ -38,13 +38,12 @@ export const FileUpload = () => {
   return (
     <Fragment>
       {message ? <Message msg={message} /> : null}
-      <div className="custom-file mb-4">
-        <label>Enter Image URL</label>
+      <div className="custom-file mb-4 mt-5">
         <input
           type="text"
           className="form-control"
           id="exampleFormControlInput1"
-          placeholder="Enter Image URL"
+          placeholder="Please Enter an Image URL"
           onChange={onChange}
         ></input>
       </div>
