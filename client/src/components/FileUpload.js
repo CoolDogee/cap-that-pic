@@ -61,7 +61,7 @@ export const FileUpload = () => {
       ) : null}
       {setUrl ? (
         <div className="row mt-5 mb-5">
-          <div className="col-md-6 m-auto text-center">
+          <div className="col-md-8 m-auto text-center">
             <h4>{caption[0]}</h4>
             <h4>{caption[1]}</h4>
             <h4>{caption[2]}</h4>
