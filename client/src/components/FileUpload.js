@@ -38,21 +38,20 @@ export const FileUpload = () => {
   return (
     <Fragment>
       {message ? <Message msg={message} /> : null}
-      <div className="custom-file mb-4">
-        <label>Enter Image URL</label>
+      <div className="custom-file mb-4 mt-5">
         <input
           type="text"
           className="form-control"
           id="exampleFormControlInput1"
-          placeholder="Enter Image URL"
+          placeholder="Please Enter an Image URL"
           onChange={onChange}
         ></input>
       </div>
       {setUrl ? (
         <div className="row mt-5">
-          <div className="col-md-6 m-auto">
+          <div className="col-md-6 m-auto text-center">
             <img
-              style={{ width: "100%" }}
+              style={{ width: "70%" }}
               src={url}
               className="img-fluid"
               alt=""
@@ -62,7 +61,7 @@ export const FileUpload = () => {
       ) : null}
       {setUrl ? (
         <div className="row mt-5 mb-5">
-          <div className="col-lg-8 m-auto">
+          <div className="col-md-8 m-auto text-center">
             <h4>{caption[0]}</h4>
             <h4>{caption[1]}</h4>
             <h4>{caption[2]}</h4>
@@ -70,13 +69,15 @@ export const FileUpload = () => {
         </div>
       ) : null}
       {status ? (
-        <form onSubmit={onSubmit}>
-          <input
-            type="submit"
-            value="Generate Caption"
-            className="btn btn-primary btn-block mt-4"
-          />
-        </form>
+        <div className="mt-5 mb-5 text-center">
+          <form onSubmit={onSubmit}>
+            <input
+              type="submit"
+              value="Generate Caption"
+              className="btn btn-secondary btn-lg"
+            />
+          </form>
+        </div>
       ) : null}
     </Fragment>
   );
