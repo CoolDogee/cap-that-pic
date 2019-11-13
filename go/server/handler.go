@@ -2,9 +2,7 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -17,7 +15,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/joho/godotenv"
 )
 
 type Image struct {
@@ -164,12 +161,8 @@ func GetLyricsLines(songs *[]models.Song) [][]string {
 
 // getTagsFromImage for /getTagsfromImage endpoint
 func getTagsFromImage(c *gin.Context) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	computerVisionKey := os.Getenv("computerVisionKey")
-	endpointURL := os.Getenv("endpointURL")
+	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
+	endpointURL := os.Getenv("ENDPOINT_URL")
 
 	computerVisionClient := computervision.New(endpointURL)
 	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
@@ -184,18 +177,9 @@ func getTagsFromImage(c *gin.Context) {
 		log.Fatal(err)
 	}
 
-	files, err := ioutil.ReadDir("./../client/public/uploads")
-	if err != nil {
-		log.Fatal(err)
-	}
-	var imgName string
-	for _, f := range files {
-		imgName = f.Name()
-	}
+	imgName := "animals.jpg"
 
-	imgName = "animals.jpg"
-
-	localImagePath := baseDir + "/../client/public/uploads/" + imgName
+	localImagePath := baseDir + "/../../client/public/uploads/" + imgName
 
 	c.JSON(200, TagLocalImage(computerVisionClient, localImagePath))
 }
@@ -220,7 +204,6 @@ func GetTagsFromImage(img string) []models.Tag {
 	}
 
 	localImagePath := baseDir + "/../client/public/uploads/" + img
-	fmt.Println(localImagePath)
 	return TagLocalImage(computerVisionClient, localImagePath)
 }
 
