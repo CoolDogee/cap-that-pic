@@ -1,5 +1,6 @@
 import React from "react";
 import FileUpload from "./components/FileUpload";
+import Footer from "./components/Footer";
 import Typist from "react-typist";
 import "./App.css";
 
@@ -13,6 +14,7 @@ const App = () => (
     </h4>
     <hr></hr>
     <FileUpload />
+    <Footer />
   </div>
 );
 
