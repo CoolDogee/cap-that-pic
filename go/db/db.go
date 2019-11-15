@@ -149,3 +149,36 @@ func SetupDB() {
 	AddLyricsToDB(client)
 	fmt.Println("Added lysics to DB successfully.")
 }
+
+func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
+	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
+	_, err := collection.InsertOne(context.TODO(), *caption)
+	return err
+}
+
+func AddPostToDB(client *mongo.Client, post *models.Post) error {
+	collection := client.Database("CAP-THAT-PIC").Collection("Post")
+	_, err := collection.InsertOne(context.TODO(), *post)
+	return err
+}
+
+func GetCaptionByID(client *mongo.Client, id string) (*models.Caption, error) {
+	var result models.Caption
+	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
+	objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.D{{"_id", objID}}
+
+	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	fmt.Printf("Found a single document: %+v\n", result)
+	return &result, err
+}
+
+func GetPostByID(client *mongo.Client, id string) (*models.Post, error) {
+	var result models.Post
+	collection := client.Database("CAP-THAT-PIC").Collection("Post")
+	objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.D{{"_id", objID}}
+
+	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	return &result, err
+}
