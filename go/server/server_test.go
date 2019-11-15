@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cooldogee/cap-that-pic/data"
 	"github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -34,8 +33,11 @@ var _ = Describe("Server", func() {
 	)
 
 	BeforeEach(func() {
-		router = server.CreateRouter()
-		data.Reload()
+		router = gin.Default()
+		// data.Reload()
+		server.SetupRoutes(router)
+		router.Run()
+
 	})
 
 	Describe("Version 1 API at /api/v1", func() {
@@ -53,6 +55,48 @@ var _ = Describe("Server", func() {
 			})
 		})
 	})
+
+	Describe("Version 1 API at /api/v1", func() {
+		Describe("The /validateImageURL endpoint", func() {
+			BeforeEach(func() {
+				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")
+			})
+
+			It("Returns with Status 200", func() {
+				Expect(response.Code).To(Equal(200))
+			})
+		})
+		Describe("The /validateImageURL endpoint", func() {
+			BeforeEach(func() {
+				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=https://cms.hostelworld.com")
+			})
+
+			It("Returns with Status 400", func() {
+				Expect(response.Code).To(Equal(http.StatusBadRequest))
+			})
+		})
+		Describe("The /validateImageURL endpoint", func() {
+			BeforeEach(func() {
+				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=htt")
+			})
+
+			It("Returns with Status 400", func() {
+				Expect(response.Code).To(Equal(http.StatusBadRequest))
+			})
+		})
+
+		Describe("The /validateImageURL endpoint", func() {
+			BeforeEach(func() {
+				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=www.google.com")
+			})
+
+			It("Returns with Status 400", func() {
+				Expect(response.Code).To(Equal(http.StatusBadRequest))
+			})
+		})
+
+	})
+
 	// Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
 	// 	BeforeEach(func() {
 	// 		response = performRequest(router, "GET", "/api/v1/getcaption?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")
