@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"reflect"
 	"time"
 
@@ -21,14 +20,19 @@ import (
 // ConnectToDB makes connection with database
 func ConnectToDB() *mongo.Client {
 	// Set client options
-	username := os.Getenv("MONGODB_USERNAME")
-	password := os.Getenv("MONGODB_PASSWORD")
-	clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1")
+	// username := os.Getenv("MONGODB_USERNAME")
+	// password := os.Getenv("MONGODB_PASSWORD")
+	// clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1")
+	// Use local DB
+	// 172.20.0.1
+	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
+		fmt.Println("Fail to connect to MongoDB: ", err)
 		log.Fatal(err)
 	}
 
@@ -36,6 +40,7 @@ func ConnectToDB() *mongo.Client {
 	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
+		fmt.Println("Fail to connect to MongoDB: ", err)
 		log.Fatal(err)
 	}
 
@@ -49,6 +54,7 @@ func CloseConnectionDB(client *mongo.Client) {
 	err := client.Disconnect(context.TODO())
 
 	if err != nil {
+		fmt.Println("Fail to close MongoDB: ", err)
 		log.Fatal(err)
 	}
 	fmt.Println("Connection to MongoDB closed.")
@@ -66,7 +72,9 @@ func AddLyricsToDB(client *mongo.Client) {
 		fmt.Println("Number of documents removed: ", n)
 	}
 
-	byteValues, err := ioutil.ReadFile("../lyrics/lyrics.json")
+	// Ref the location of lyrics in the dockerfile
+	// byteValues, err := ioutil.ReadFile("../lyrics/lyrics.json")
+	byteValues, err := ioutil.ReadFile("./lyrics.json")
 
 	if err != nil {
 		// Print any IO errors with the .json file
@@ -130,4 +138,12 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 	}
 
 	return songs
+}
+
+// SetupDB adds lyrics to DB
+func SetupDB() {
+	fmt.Println("Add lysics to DB...")
+	client := ConnectToDB()
+	AddLyricsToDB(client)
+	fmt.Println("Added lysics to DB successfully.")
 }

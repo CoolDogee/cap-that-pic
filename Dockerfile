@@ -11,6 +11,7 @@ RUN npm run build
 FROM alpine:latest
 COPY --from=builder /app/go/main ./
 COPY --from=node_builder /build ./web
+COPY --from=builder /app/lyrics/lyrics.json ./lyrics.json
 RUN chmod +x ./main
 EXPOSE 8080
 
