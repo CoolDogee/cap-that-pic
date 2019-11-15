@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/cooldogee/cap-that-pic/data"
@@ -242,4 +244,47 @@ func TagLocalImage(client computervision.BaseClient, localImagePath string) ([]m
 		tags = append(tags, tag)
 	}
 	return tags, nil
+}
+
+func validateImageURL(c *gin.Context) {
+	url1 := c.Request.URL.Query().Get("fileName")
+	uri, err := url.Parse(url1)
+	if err != nil {
+		// Error
+		c.String(http.StatusBadRequest, "Not a validate URL.")
+	}
+	if uri.Scheme != "http" && uri.Scheme != "https" {
+		c.String(http.StatusBadRequest, "Not a validate URL.")
+		return
+	}
+	r, err := http.Get(url1)
+	if err != nil {
+		fmt.Println("URL cannot reach: ", err)
+		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: ", err))
+		return
+	}
+	if r == nil || r.Body == nil {
+		fmt.Println("No body found")
+		c.String(http.StatusBadRequest, "No body found")
+		return
+	}
+	if r.StatusCode != http.StatusOK {
+		fmt.Println("URL cannot reach: ", r.StatusCode)
+		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: ", r.StatusCode))
+		return
+	}
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Cannot read the file: ", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Cannot read the file: ", err.Error()))
+		return
+	}
+	// fmt.Println(http.DetectContentType(buff)) // do something based on your detection.
+	fmt.Println(http.DetectContentType(body))
+	if !strings.HasPrefix(http.DetectContentType(body), "image") {
+		c.String(http.StatusBadRequest, "Not an image.")
+		return
+	}
+	c.String(http.StatusOK, "Valid image.")
 }
