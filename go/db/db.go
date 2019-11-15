@@ -24,7 +24,10 @@ func ConnectToDB() *mongo.Client {
 	// password := os.Getenv("MONGODB_PASSWORD")
 	// clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1")
 	// Use local DB
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	// 172.20.0.1
+	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
@@ -69,7 +72,9 @@ func AddLyricsToDB(client *mongo.Client) {
 		fmt.Println("Number of documents removed: ", n)
 	}
 
-	byteValues, err := ioutil.ReadFile("../lyrics/lyrics.json")
+	// Ref the location of lyrics in the dockerfile
+	// byteValues, err := ioutil.ReadFile("../lyrics/lyrics.json")
+	byteValues, err := ioutil.ReadFile("./lyrics.json")
 
 	if err != nil {
 		// Print any IO errors with the .json file
@@ -137,6 +142,8 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 
 // SetupDB adds lyrics to DB
 func SetupDB() {
+	fmt.Println("Add lysics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
+	fmt.Println("Added lysics to DB successfully.")
 }
