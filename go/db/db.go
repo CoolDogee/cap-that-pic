@@ -134,3 +134,9 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 
 	return songs
 }
+
+// SetupDB adds lyrics to DB
+func SetupDB() {
+	client := ConnectToDB()
+	AddLyricsToDB(client)
+}
