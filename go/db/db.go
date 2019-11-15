@@ -29,6 +29,7 @@ func ConnectToDB() *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
+		fmt.Println("Fail to connect to MongoDB: ", err)
 		log.Fatal(err)
 	}
 
@@ -36,6 +37,7 @@ func ConnectToDB() *mongo.Client {
 	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
+		fmt.Println("Fail to connect to MongoDB: ", err)
 		log.Fatal(err)
 	}
 
@@ -49,6 +51,7 @@ func CloseConnectionDB(client *mongo.Client) {
 	err := client.Disconnect(context.TODO())
 
 	if err != nil {
+		fmt.Println("Fail to close MongoDB: ", err)
 		log.Fatal(err)
 	}
 	fmt.Println("Connection to MongoDB closed.")

@@ -2,8 +2,9 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io"
-	"log"
+	"net/http"
 	"os"
 
 	"github.com/cooldogee/cap-that-pic/data"
@@ -34,7 +35,12 @@ func hello(c *gin.Context) {
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
 	img := c.Request.URL.Query().Get("fileName")
-	tags := GetTagFromRemoteImage(img)
+	tags, err := GetTagFromRemoteImage(img)
+	if err != nil {
+		fmt.Println("Get caption ERROR: ", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Get caption ERROR: %s", err))
+		return
+	}
 	client := db.ConnectToDB()
 	songs := db.GetLyricsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
@@ -44,7 +50,7 @@ func getCaption(c *gin.Context) {
 	c.JSON(200, caption.Content)
 }
 
-func GetTagFromRemoteImage(remoteImgUrl string) []models.Tag {
+func GetTagFromRemoteImage(remoteImgUrl string) ([]models.Tag, error) {
 	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
 	endpointURL := os.Getenv("ENDPOINT_URL")
 
@@ -56,7 +62,7 @@ func GetTagFromRemoteImage(remoteImgUrl string) []models.Tag {
 	return TagRemoteImage(computerVisionClient, remoteImgUrl)
 }
 
-func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) []models.Tag {
+func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) ([]models.Tag, error) {
 	var remoteImage computervision.ImageURL
 	remoteImage.URL = &remoteImageURL
 	remoteImageTags, err := client.TagImage(
@@ -64,14 +70,14 @@ func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) []m
 		remoteImage,
 		"")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	var tags []models.Tag
 	for _, caption := range *remoteImageTags.Tags {
 		tag := models.Tag{*caption.Name, *caption.Confidence * 100}
 		tags = append(tags, tag)
 	}
-	return tags
+	return tags, nil
 }
 
 //********** Use API get tags of an image Here ***************
@@ -173,19 +179,27 @@ func getTagsFromImage(c *gin.Context) {
 	baseDir, err := os.Getwd()
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Get tag from image ERROR: ", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Get tag from image ERROR: %s", err))
+		return
 	}
 
 	imgName := "animals.jpg"
 
 	localImagePath := baseDir + "/../../client/public/uploads/" + imgName
 
-	c.JSON(200, TagLocalImage(computerVisionClient, localImagePath))
+	tags, err := TagLocalImage(computerVisionClient, localImagePath)
+	if err != nil {
+		fmt.Println("Tag local image ERROR: ", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Tag local image ERROR: %s", err))
+		return
+	}
+	c.JSON(200, tags)
 }
 
 // GetTagsFromImage return tags for an image
 // Utility function for getCaption
-func GetTagsFromImage(img string) []models.Tag {
+func GetTagsFromImage(img string) ([]models.Tag, error) {
 	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
 	endpointURL := os.Getenv("ENDPOINT_URL")
 
@@ -199,18 +213,18 @@ func GetTagsFromImage(img string) []models.Tag {
 	baseDir, err := os.Getwd()
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	localImagePath := baseDir + "/../client/public/uploads/" + img
 	return TagLocalImage(computerVisionClient, localImagePath)
 }
 
-func TagLocalImage(client computervision.BaseClient, localImagePath string) []models.Tag {
+func TagLocalImage(client computervision.BaseClient, localImagePath string) ([]models.Tag, error) {
 	var localImage io.ReadCloser
 	localImage, err := os.Open(localImagePath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	localImageTags, err := client.TagImageInStream(
@@ -218,7 +232,7 @@ func TagLocalImage(client computervision.BaseClient, localImagePath string) []mo
 		localImage,
 		"")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var tags []models.Tag
@@ -227,5 +241,5 @@ func TagLocalImage(client computervision.BaseClient, localImagePath string) []mo
 		tag := models.Tag{*caption.Name, *caption.Confidence * 100}
 		tags = append(tags, tag)
 	}
-	return tags
+	return tags, nil
 }
