@@ -25,8 +25,10 @@ func ConnectToDB() *mongo.Client {
 	// clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1")
 	// Use local DB
 	// 172.20.0.1
-	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+	// for local mongo db
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	// for docker mongo db
+	//clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
