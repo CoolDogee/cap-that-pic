@@ -55,7 +55,7 @@ var _ = Describe("Server", func() {
 			})
 		})
 	})
-	Describe("GET the /getTagsFromRemoteImage", func() {
+	Describe("GET the /getTagsFromRemoteImage to get tags for a remote image", func() {
 		BeforeEach(func() {
 			response = performRequest(router, "GET", "/api/v1/getTagsFromRemoteImage?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")
 		})
