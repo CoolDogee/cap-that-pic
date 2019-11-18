@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"time"
 
@@ -20,15 +21,25 @@ import (
 // ConnectToDB makes connection with database
 func ConnectToDB() *mongo.Client {
 	// Set client options
-	// username := os.Getenv("MONGODB_USERNAME")
-	// password := os.Getenv("MONGODB_PASSWORD")
-	// clientOptions := options.Client().ApplyURI("mongodb+srv://" + username + ":" + password + "@cluster-lrx2r.mongodb.net/test?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1")
-	// Use local DB
-	// 172.20.0.1
-	// for local mongo db
-	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	// for docker mongo db
-	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+
+	// RUNTIME_ENV = "local" or "docker"
+	runtimeEnv := os.Getenv("RUNTIME_ENV")
+	clientOptions := options.Client().ApplyURI("")
+	if runtimeEnv == "LOCAL" {
+		// for local mongo db
+		log.Println("Environment variable RUNTIME_ENV is LOCAL, use db url localhost:27017")
+		clientOptions = options.Client().ApplyURI("mongodb://localhost:27017")
+	} else if runtimeEnv == "DOCKER" || runtimeEnv == "" {
+		// for docker mongo db
+		if runtimeEnv == "DOCKER" {
+			log.Println("Environment variable RUNTIME_ENV is DOCKER, use db url mongo:27017 (docker localhost)")
+		} else {
+			log.Println("Environment variable RUNTIME_ENV is undefined, use db url mongo:27017 (docker localhost)")
+		}
+		clientOptions = options.Client().ApplyURI("mongodb://mongo:27017")
+	} else {
+		log.Fatal("Wrong RUNTIME_ENV")
+	}
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
