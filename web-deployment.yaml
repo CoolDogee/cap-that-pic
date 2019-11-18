@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      io.kompose.service: web
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: web
+    spec:
+      containers:
+      - image: {your_image}
+        name: web
+        ports:
+        - containerPort: 8080
+        resources: {}
+        env:
+         - name: ENV
+           value: development
+         - name: GCP_PROJECT_ID
+           value: kouzoh-p-{your_gcp_project_id}
+         - name: SENTRY_DSN
+           value: https://1234@sentry.io/1234
+      restartPolicy: Always
+status: {}
