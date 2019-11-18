@@ -1,12 +1,19 @@
 version: '2'
 services: 
   mongo:
+    networks:
+      - webproxy
     image: "mongo:latest"
     container_name: "mongodb"
     ports:
       - 27017:27017
     command: mongod 
   web:
+    networks:
+      - webproxy
     build: .
     ports: 
       - 8080:8080
+networks:
+  webproxy:
+    driver: bridge
