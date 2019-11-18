@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cooldogee/cap-that-pic/data"
 	"github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -33,11 +34,8 @@ var _ = Describe("Server", func() {
 	)
 
 	BeforeEach(func() {
-		router = gin.Default()
-		// data.Reload()
-		server.SetupRoutes(router)
-		router.Run()
-
+		router = server.CreateRouter()
+		data.Reload()
 	})
 
 	Describe("Version 1 API at /api/v1", func() {
