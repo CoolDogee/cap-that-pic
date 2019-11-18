@@ -261,7 +261,7 @@ func validateImageURL(c *gin.Context) {
 	r, err := http.Get(url1)
 	if err != nil {
 		fmt.Println("URL cannot reach: ", err)
-		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: ", err))
+		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: %s", err))
 		return
 	}
 	if r == nil || r.Body == nil {
@@ -271,14 +271,14 @@ func validateImageURL(c *gin.Context) {
 	}
 	if r.StatusCode != http.StatusOK {
 		fmt.Println("URL cannot reach: ", r.StatusCode)
-		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: ", r.StatusCode))
+		c.String(http.StatusBadRequest, fmt.Sprintf("URL cannot reach: %s", r.StatusCode))
 		return
 	}
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("Cannot read the file: ", err)
-		c.String(http.StatusInternalServerError, fmt.Sprintf("Cannot read the file: ", err.Error()))
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Cannot read the file: %s", err.Error()))
 		return
 	}
 	// log.Println(http.DetectContentType(buff)) // do something based on your detection.
