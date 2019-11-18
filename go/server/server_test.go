@@ -57,7 +57,7 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("Version 1 API at /api/v1", func() {
-		Describe("The /validateImageURL endpoint", func() {
+		Describe("The /validateImageURL endpoint when link is an image", func() {
 			BeforeEach(func() {
 				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")
 			})
@@ -66,7 +66,7 @@ var _ = Describe("Server", func() {
 				Expect(response.Code).To(Equal(200))
 			})
 		})
-		Describe("The /validateImageURL endpoint", func() {
+		Describe("The /validateImageURL endpoint when link is valid but not an image", func() {
 			BeforeEach(func() {
 				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=https://cms.hostelworld.com")
 			})
@@ -75,7 +75,7 @@ var _ = Describe("Server", func() {
 				Expect(response.Code).To(Equal(http.StatusBadRequest))
 			})
 		})
-		Describe("The /validateImageURL endpoint", func() {
+		Describe("The /validateImageURL endpoint when link is invalid", func() {
 			BeforeEach(func() {
 				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=htt")
 			})
@@ -85,7 +85,7 @@ var _ = Describe("Server", func() {
 			})
 		})
 
-		Describe("The /validateImageURL endpoint", func() {
+		Describe("The /validateImageURL endpoint is valid but not an image", func() {
 			BeforeEach(func() {
 				response = performRequest(router, "GET", "/api/v1/validateImageURL?fileName=www.google.com")
 			})
