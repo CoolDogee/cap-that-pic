@@ -4,8 +4,9 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Caption struct {
 	ID   primitive.ObjectID `bson:"_id, omitempty"`
-	Text string
+	Text []string
 	Src  string
 	Mood string
 	Tags []string
+	Type string // song, movie, poem, book, etc.
 }
