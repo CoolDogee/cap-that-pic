@@ -24,9 +24,9 @@ func ConnectToDB() *mongo.Client {
 
 	// RUNTIME_ENV = "local" or "docker"
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
-	// for local mongo db
 	clientOptions := options.Client().ApplyURI("")
 	if runtimeEnv == "LOCAL" {
+		// for local mongo db
 		log.Panicln("Environment variable RUNTIME_ENV is LOCAL, use db url localhost:27017")
 		clientOptions = options.Client().ApplyURI("mongodb://localhost:27017")
 	} else if runtimeEnv == "DOCKER" || runtimeEnv == "" {
