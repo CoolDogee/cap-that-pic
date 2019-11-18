@@ -53,11 +53,10 @@ func getCaption(c *gin.Context) {
 	c.JSON(200, caption.Content)
 }
 
-
 func getTagsFromRemoteImage(c *gin.Context) {
 	url := string(c.Query("fileName"))
 	res, err := GetTagFromRemoteImage(url)
-	if err!= nil {
+	if err != nil {
 		fmt.Println(err)
 	}
 	c.JSON(200, res)
