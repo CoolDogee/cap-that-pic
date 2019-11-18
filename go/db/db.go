@@ -26,15 +26,15 @@ func ConnectToDB() *mongo.Client {
 	// Use local DB
 	// 172.20.0.1
 	// for local mongo db
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	// for docker mongo db
-	//clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
-		fmt.Println("Fail to connect to MongoDB: ", err)
+		log.Panicln("Fail to connect to MongoDB.")
 		log.Fatal(err)
 	}
 
@@ -42,11 +42,11 @@ func ConnectToDB() *mongo.Client {
 	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
-		fmt.Println("Fail to connect to MongoDB: ", err)
+		log.Println("Fail to connect to MongoDB: ", err)
 		log.Fatal(err)
 	}
 
-	fmt.Println("Connected to MongoDB!")
+	log.Println("Connected to MongoDB!")
 
 	return client
 }
@@ -56,10 +56,10 @@ func CloseConnectionDB(client *mongo.Client) {
 	err := client.Disconnect(context.TODO())
 
 	if err != nil {
-		fmt.Println("Fail to close MongoDB: ", err)
+		log.Println("Fail to close MongoDB: ", err)
 		log.Fatal(err)
 	}
-	fmt.Println("Connection to MongoDB closed.")
+	log.Println("Connection to MongoDB closed.")
 }
 
 // AddLyricsToDB makes a connection with the NoSQL database
@@ -69,9 +69,9 @@ func AddLyricsToDB(client *mongo.Client) {
 	n, err := collection.DeleteMany(ctx, bson.M{})
 
 	if err != nil {
-		fmt.Println("DeleteMany ERROR:", err)
+		log.Println("DeleteMany ERROR:", err)
 	} else {
-		fmt.Println("Number of documents removed: ", n)
+		log.Println("Number of documents removed: ", n)
 	}
 
 	// Ref the location of lyrics in the dockerfile
@@ -80,23 +80,23 @@ func AddLyricsToDB(client *mongo.Client) {
 
 	if err != nil {
 		// Print any IO errors with the .json file
-		fmt.Println("ioutil.ReadFile ERROR:", err)
+		log.Println("ioutil.ReadFile ERROR:", err)
 	}
 
 	var docs []models.Song
 	err = json.Unmarshal(byteValues, &docs)
 
 	// Print MongoDB docs object type
-	fmt.Println("nMongoFields Docs:", reflect.TypeOf(docs), len(docs))
+	log.Println("nMongoFields Docs:", reflect.TypeOf(docs), len(docs))
 
 	for i := range docs {
 		doc := docs[i]
 		result, err := collection.InsertOne(ctx, doc)
 
 		if err != nil {
-			fmt.Println("InsertOne ERROR:", err)
+			log.Println("InsertOne ERROR:", err)
 		} else {
-			fmt.Println("InsertOne() API result:", result)
+			log.Println("InsertOne() API result:", result)
 		}
 	}
 }
@@ -123,16 +123,16 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 	cursor, err := collection.Find(ctx, filter)
 
 	if err != nil {
-		fmt.Println("Find ERROR:", err)
+		log.Println("Find ERROR:", err)
 		defer cursor.Close(ctx)
 	} else {
-		fmt.Println("Find() API result:", cursor)
+		log.Println("Find() API result:", cursor)
 		for cursor.Next(ctx) {
 			var result models.Song
 			err = cursor.Decode(&result)
 
 			if err != nil {
-				fmt.Println("cursor.Next() error: ", err)
+				log.Println("cursor.Next() error: ", err)
 			} else {
 				songs = append(songs, result)
 			}
@@ -144,10 +144,10 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 
 // SetupDB adds lyrics to DB
 func SetupDB() {
-	fmt.Println("Add lysics to DB...")
+	log.Println("Add lysics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
-	fmt.Println("Added lysics to DB successfully.")
+	log.Println("Added lysics to DB successfully.")
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
