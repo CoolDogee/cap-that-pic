@@ -27,16 +27,16 @@ func ConnectToDB() *mongo.Client {
 	clientOptions := options.Client().ApplyURI("")
 	if runtimeEnv == "LOCAL" {
 		// for local mongo db
-		log.Panicln("Environment variable RUNTIME_ENV is LOCAL, use db url localhost:27017")
+		log.Println("Environment variable RUNTIME_ENV is LOCAL, use db url localhost:27017")
 		clientOptions = options.Client().ApplyURI("mongodb://localhost:27017")
 	} else if runtimeEnv == "DOCKER" || runtimeEnv == "" {
 		// for docker mongo db
 		if runtimeEnv == "DOCKER" {
-			log.Panicln("Environment variable RUNTIME_ENV is DOCKER, use db url 172.20.0.1:27017 (docker localhost)")
+			log.Println("Environment variable RUNTIME_ENV is DOCKER, use db url mongo:27017 (docker localhost)")
 		} else {
-			log.Panicln("Environment variable RUNTIME_ENV is undefined, use db url 172.20.0.1:27017 (docker localhost)")
+			log.Println("Environment variable RUNTIME_ENV is undefined, use db url mongo:27017 (docker localhost)")
 		}
-		clientOptions = options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+		clientOptions = options.Client().ApplyURI("mongodb://mongo:27017")
 	} else {
 		log.Fatal("Wrong RUNTIME_ENV")
 	}
