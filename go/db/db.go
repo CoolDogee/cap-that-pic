@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -113,7 +114,52 @@ func AddLyricsToDB(client *mongo.Client) {
 			UserGenerated: false,
 		}
 		caption.ID = primitive.NewObjectID()
-		log.Println(caption.ID.String())
+		result, err := collection.InsertOne(ctx, caption)
+		if err != nil {
+			log.Println("InsertOne ERROR:", err)
+		} else {
+			log.Println("InsertOne() API result:", result)
+		}
+	}
+}
+
+// AddPoemsToDB adds poems to mongodb database
+func AddPoemsToDB(client *mongo.Client) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	// collection := client.Database("CAP-THAT-PIC").Collection("Lyrics")
+	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
+
+	files, err := filepath.Glob("../poem/*.json")
+
+	if err != nil {
+		log.Println("filepath.Glob ERROR:", err)
+	}
+	var poem map[string]interface{}
+
+	for _, f := range files {
+		byteValues, err := ioutil.ReadFile(f)
+		if err != nil {
+			// Print any IO errors with the .json file
+			log.Println("ioutil.ReadFile ERROR:", err)
+		}
+		
+		json.Unmarshal([]byte(byteValues), &poem)
+
+		// log.Printf("%#v", poem["text"])
+
+		caption := models.Caption{
+			Src:           poem["reference"].(string),
+			Type:          "poem",
+			UserGenerated: false,
+		}
+		caption.ID = primitive.NewObjectID()
+		for _, line := range poem["text"].([]interface{}) {
+			caption.Text = append(caption.Text, line.(string))
+		}
+		for _, tag := range poem["keywords"].([]interface{}) {
+			caption.Tags = append(caption.Tags, tag.(string))
+		}
+		caption.Tags = append(caption.Tags, poem["author"].(string))
 		result, err := collection.InsertOne(ctx, caption)
 		if err != nil {
 			log.Println("InsertOne ERROR:", err)
@@ -169,6 +215,7 @@ func SetupDB() {
 	log.Println("Add lysics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
+	AddPoemsToDB(client)
 	log.Println("Added lysics to DB successfully.")
 }
 
