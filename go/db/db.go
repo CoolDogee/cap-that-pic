@@ -197,6 +197,45 @@ func AddPoemsToDB(client *mongo.Client) {
 	}
 }
 
+// AddMovieQuotesToDB adds movie quotes to mongodb
+func AddMovieQuotesToDB(client *mongo.Client) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
+
+	var caption models.Caption
+	filter := bson.M{"type": "movie"}
+	err := collection.FindOne(ctx, filter).Decode(&caption)
+	log.Println(caption)
+	if err==nil {
+		return
+	}
+
+	byteValues, err := ioutil.ReadFile("../movie/movie_quotes.json")
+
+	if err != nil {
+		log.Println("ioutil.ReadFile ERROR:", err)
+	}
+
+	var movies []map[string]interface{}
+	json.Unmarshal([]byte(byteValues), &movies)
+
+	for _, movie := range movies {
+		caption := models.Caption{
+			Text:          []string{movie["text"].(string)},
+			Src:           movie["movie"].(string),
+			Type:          "movie",
+			UserGenerated: false,
+		}
+		caption.ID = primitive.NewObjectID()
+		result, err := collection.InsertOne(ctx, caption)
+		if err != nil {
+			log.Println("InsertOne ERROR:", err)
+		} else {
+			log.Println("InsertOne() API result:", result)
+		}
+	}
+}
+
 // GetLyricsUsingTags returns list of songs which have atleast one tag in their title
 func GetLyricsUsingTags(client *mongo.Client, tags []models.Tag) []models.Song {
 	var songs []models.Song
@@ -246,6 +285,8 @@ func SetupDB() {
 	log.Println("Added lysics to DB successfully.")
 	AddPoemsToDB(client)
 	log.Println("Added poems to DB successfully.")
+	AddMovieQuotesToDB(client)
+	log.Println("Added movie quotes to DB successfully.")
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
