@@ -4,44 +4,43 @@ import Loading from "./Loading";
 import axios from "axios";
 import { API_URL } from "../config";
 import Typist from "react-typist";
-import Footer from "./Footer";
 
-
-export const FileUpload = () => {
+export const AllPostsPage = () => {
   const [message, setMessage] = useState("");
   const [url, setUrl] = useState("");
+  const [captions, setCaption] = useState([]);
   const [status, setStatus] = useState(false);
-  const [loadingstatus, setLoadingstatus] = useState(false);
+  const [secstatus, setSecStatus] = useState(false);
+  const [tristatus, setTriStatus] = useState(false);
 
   const onChange = e => {
     setUrl(e.target.value);
     setStatus(true);
+    setTriStatus(false);
   };
 
   const onSubmit = async e => {
     e.preventDefault();
-    setLoadingstatus(true);
+    setSecStatus(true);
 
     try {
-      const res = await axios.get(API_URL + "/api/v1/validateImageURL", {
+      const res = await axios.get("http://google.com", {//API_URL + "/api/v1/getcaption", {
         params: { fileName: url }
       });
 
-      setLoadingstatus(false);
       if (res.status === 200) {
-        localStorage.setItem("imageUrl", url);
-        console.log(res.data);
-        setMessage("Generating captions! Hold tight ...")
-        setTimeout(() => {
-          window.location = "/choose-caption";
-        }, 2500);
+        // const capLines = res.data.split("\n");
+        // setCaption(capLines);
+        // setSecStatus(false);
+        // setTriStatus(true);
+        localStorage.setItem("imageUrl", this.state.url);
       }
     } catch (err) {
-      console.log(err.response);
       if (err.response.status === 500) {
+        console.log(err.response);
         setMessage("Internal Server Error!");
       } else {
-        setMessage(err.response.data);
+        setMessage(err.response.data.message);
       }
     }
   };
@@ -77,7 +76,16 @@ export const FileUpload = () => {
           </div>
         </div>
       ) : null}
-      {loadingstatus ? <Loading /> : null}
+      {secstatus ? <Loading /> : null}
+      {tristatus ? (
+        <div className="row mt-5 mb-5">
+          <div className="col-md-8 m-auto text-center">
+            <h4>{captions[0]}</h4>
+            <h4>{captions[1]}</h4>
+            <h4>{captions[2]}</h4>
+          </div>
+        </div>
+      ) : null}
       {status ? (
         <div
           className="mt-5 mb-5 text-center"
@@ -92,9 +100,8 @@ export const FileUpload = () => {
           </form>
         </div>
       ) : null}
-      <Footer />
     </Fragment>
   );
 };
 
-export default FileUpload;
+export default AllPostsPage;

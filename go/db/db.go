@@ -22,7 +22,6 @@ import (
 // ConnectToDB makes connection with database
 func ConnectToDB() *mongo.Client {
 	// Set client options
-
 	// RUNTIME_ENV = "local" or "docker"
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	clientOptions := options.Client().ApplyURI("")
@@ -279,10 +278,10 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 
 // SetupDB adds lyrics to DB
 func SetupDB() {
-	log.Println("Add lysics to DB...")
+	log.Println("Add lyrics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
-	log.Println("Added lysics to DB successfully.")
+	log.Println("Added lyrics to DB successfully.")
 	AddPoemsToDB(client)
 	log.Println("Added poems to DB successfully.")
 	AddMovieQuotesToDB(client)

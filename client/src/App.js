@@ -1,21 +1,30 @@
 import React from "react";
-import FileUpload from "./components/FileUpload";
-import Footer from "./components/Footer";
-import Typist from "react-typist";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 
-const App = () => (
-  <div className="container mt-4">
-    <h1 className="display-3 text-center mb-4">
-      <i className="fas fa-music"></i> Cap That Pic
-    </h1>
-    <h4 className="text-center mb-4">
-      <Typist> Every Picture Deserves The Perfect Caption</Typist>
-    </h4>
-    <hr></hr>
-    <FileUpload />
-    <Footer />
-  </div>
-);
+import routes from "./routes";
+import withTracker from "./withTracker";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default App;
+export default () => (
+  <Router basename={process.env.REACT_APP_BASENAME || ""}>
+    <div className="container mt-4">
+      {routes.map((route, index) => {
+        return (
+          <Route
+            key={index}
+            path={route.path}
+            exact={route.exact}
+            component={withTracker(props => {
+              return (
+                <route.layout {...props}>
+                  <route.component {...props} />
+                </route.layout>
+              );
+            })}
+          />
+        );
+      })}
+    </div>
+  </Router>
+);
