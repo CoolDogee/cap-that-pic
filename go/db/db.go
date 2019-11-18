@@ -26,9 +26,9 @@ func ConnectToDB() *mongo.Client {
 	// Use local DB
 	// 172.20.0.1
 	// for local mongo db
-	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	// for docker mongo db
-	clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
+	// clientOptions := options.Client().ApplyURI("mongodb://172.20.0.1:27017")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -144,10 +144,10 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 
 // SetupDB adds lyrics to DB
 func SetupDB() {
-	log.Println("Add lysics to DB...")
+	log.Println("Add lyrics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
-	log.Println("Added lysics to DB successfully.")
+	log.Println("Added lyrics to DB successfully.")
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {

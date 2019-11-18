@@ -72,5 +72,5 @@ func getCaptionHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "info": ""})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "Get post successfully!", "info": caption})
+	c.JSON(http.StatusCreated, gin.H{"message": "Get caption successfully!", "info": caption})
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const Message = ({ msg }) => {
+export const Message = ({ msg }) => {
   return (
     <div className="alert alert-info alert-dismissible fade show" role="alert">
       {msg}

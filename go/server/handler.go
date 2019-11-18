@@ -262,10 +262,10 @@ func validateImageURL(c *gin.Context) {
 	uri, err := url.Parse(url1)
 	if err != nil {
 		// Error
-		c.String(http.StatusBadRequest, "Not a validate URL.")
+		c.String(http.StatusBadRequest, "Not a valid URL.")
 	}
 	if uri.Scheme != "http" && uri.Scheme != "https" {
-		c.String(http.StatusBadRequest, "Not a validate URL.")
+		c.String(http.StatusBadRequest, "Not a valid URL.")
 		return
 	}
 	r, err := http.Get(url1)
