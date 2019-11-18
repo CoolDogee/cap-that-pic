@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 
@@ -10,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cooldogee/cap-that-pic/data"
+	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/cooldogee/cap-that-pic/server"
 )
 
@@ -95,6 +97,71 @@ var _ = Describe("Server", func() {
 
 	})
 
+	Describe("GET the /getTagsFromRemoteImage", func() {
+		BeforeEach(func() {
+			response = performRequest(router, "GET", "/api/v1/getTagsFromRemoteImage?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")
+		})
+
+		It("Returns with Status 200", func() {
+			Expect(response.Code).To(Equal(200))
+		})
+
+		It("Returns with caption", func() {
+			var actual, expect []models.Tag
+			json.Unmarshal(response.Body.Bytes(), &actual)
+			expect = []models.Tag{
+				models.Tag{
+					Name: "sky",
+					Confidence: 99.76774454116821,
+				},
+				models.Tag{
+					Name: "hot air balloon",
+					Confidence: 98.5071063041687,
+				},
+				models.Tag{
+					Name: "outdoor",
+					Confidence: 95.6084668636322,
+				},
+				models.Tag{
+					Name: "aircraft",
+					Confidence: 80.06284236907959,
+				},
+				models.Tag{
+					Name: "hot air ballooning",
+					Confidence: 78.76187562942505,
+				},
+				models.Tag{
+					Name: "transport",
+					Confidence: 75.1846194267273,
+				},
+				models.Tag{
+					Name: "balloon",
+					Confidence: 68.50097179412842,
+				},
+				models.Tag{
+					Name: "aerostat",
+					Confidence: 66.42242074012756,
+				},
+				models.Tag{
+					Name: "parachute",
+					Confidence: 65.3644859790802,
+				},
+				models.Tag{
+					Name: "text",
+					Confidence: 64.2002522945404,
+				},
+				models.Tag{
+					Name: "people",
+					Confidence: 61.91748380661011,
+				},
+				models.Tag{
+					Name: "several",
+					Confidence: 10.030341148376465,
+				},
+			}
+			Expect(actual).Should(Equal(expect))
+		})
+	})
 	// Describe("GET the /getcaption?fileName=animals.jpg endpoint", func() {
 	// 	BeforeEach(func() {
 	// 		response = performRequest(router, "GET", "/api/v1/getcaption?fileName=https://cms.hostelworld.com/hwblog/wp-content/uploads/sites/2/2017/08/girlgoneabroad.jpg")

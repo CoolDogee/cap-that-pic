@@ -1,6 +1,6 @@
 # cap-that-pic
 
-### Code Chrysalis X Mercari Greenfield Project by [Sahil](https://github.com/sahil505), [Aniket](https://github.com/aniket1743), [Liu](https://github.com/Rocuku) & [Shashank](https://github.com/shashankjakka)
+### Code Chrysalis X Mercari Greenfield Project
 
 ---
 
