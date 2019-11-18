@@ -79,13 +79,22 @@ func AddLyricsToDB(client *mongo.Client) {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	// collection := client.Database("CAP-THAT-PIC").Collection("Lyrics")
 	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
-	n, err := collection.DeleteMany(ctx, bson.M{})
 
-	if err != nil {
-		log.Println("DeleteMany ERROR:", err)
-	} else {
-		log.Println("Number of documents removed: ", n)
+	var caption models.Caption
+	filter := bson.M{"type": "song"}
+	err := collection.FindOne(ctx, filter).Decode(&caption)
+	log.Println(caption)
+	if err==nil {
+		return
 	}
+
+	// n, err := collection.DeleteMany(ctx, bson.M{})
+
+	// if err != nil {
+	// 	log.Println("DeleteMany ERROR:", err)
+	// } else {
+	// 	log.Println("Number of documents removed: ", n)
+	// }
 
 	// Ref the location of lyrics in the dockerfile
 	// byteValues, err := ioutil.ReadFile("../lyrics/lyrics.json")
@@ -139,6 +148,14 @@ func AddPoemsToDB(client *mongo.Client) {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	// collection := client.Database("CAP-THAT-PIC").Collection("Lyrics")
 	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
+
+	var caption models.Caption
+	filter := bson.M{"type": "poem"}
+	err := collection.FindOne(ctx, filter).Decode(&caption)
+	log.Println(caption)
+	if err==nil {
+		return
+	}
 
 	files, err := filepath.Glob("../poem/*.json")
 
@@ -226,8 +243,9 @@ func SetupDB() {
 	log.Println("Add lysics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
-	AddPoemsToDB(client)
 	log.Println("Added lysics to DB successfully.")
+	AddPoemsToDB(client)
+	log.Println("Added poems to DB successfully.")
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
