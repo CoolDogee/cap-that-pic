@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
+	"strconv"
 
-	"github.com/cooldogee/cap-that-pic/data"
 	"github.com/cooldogee/cap-that-pic/db"
 	"github.com/cooldogee/cap-that-pic/models"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,21 @@ type Caption struct {
 	Content string
 }
 
+type Index struct {
+	x, y int
+}
+
+type Pair struct {
+	Key   Index
+	Value float64
+}
+
+type PairList []Pair
+
+func (p PairList) Len() int           { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
 var computerVisionContext context.Context
 
 func hello(c *gin.Context) {
@@ -38,26 +54,30 @@ func hello(c *gin.Context) {
 //get url of the image and return the caption generated
 func getCaption(c *gin.Context) {
 	img := c.Request.URL.Query().Get("fileName")
+	captionLength, err := strconv.Atoi(c.Request.URL.Query().Get("length"))
+	if err != nil {
+		log.Println("Get caption length ERROR: ", err)
+		c.String(400, "invalid captiion size")
+		return
+	}
 	tags, err := GetTagFromRemoteImage(img)
 	if err != nil {
 		log.Println("Get caption ERROR: ", err)
 		c.String(http.StatusInternalServerError, fmt.Sprintf("Get caption ERROR: %s", err))
 		return
 	}
+	log.Println(tags)
 	client := db.ConnectToDB()
-	songs := db.GetLyricsUsingTags(client, tags)
+	captions := db.GetCaptionsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
 
-	var caption Caption
-	caption.Content = GenerateCaption(&songs, &tags)
-	c.JSON(200, caption.Content)
+	c.JSON(200, GenerateCaption(&captions, &tags, captionLength))
 }
-
 
 func getTagsFromRemoteImage(c *gin.Context) {
 	url := string(c.Query("fileName"))
 	res, err := GetTagFromRemoteImage(url)
-	if err!= nil {
+	if err != nil {
 		fmt.Println(err)
 	}
 	c.JSON(200, res)
@@ -66,6 +86,7 @@ func getTagsFromRemoteImage(c *gin.Context) {
 func GetTagFromRemoteImage(remoteImgUrl string) ([]models.Tag, error) {
 	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
 	endpointURL := os.Getenv("ENDPOINT_URL")
+	log.Println(computerVisionKey)
 
 	computerVisionClient := computervision.New(endpointURL)
 	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
@@ -94,41 +115,110 @@ func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) ([]
 }
 
 //********** Use API get tags of an image Here ***************
-func getTagsOfImage(url string) []models.Tag {
-	tags := data.Tag(-1, 0).List
-	return tags
-}
+// func getTagsOfImage(url string) []models.Tag {
+// 	tags := data.Tag(-1, 0).List
+// 	return tags
+// }
 
 //********** Use DB get lyrics from tags Here ***************
-func getLyricsFromTags(tags *[]models.Tag) []models.Song {
-	songs := data.Song(-1, 0).List
-	return songs
+// func getLyricsFromTags(tags *[]models.Tag) []models.Caption {
+// 	Captions := data.Caption(-1, 0).List
+// 	return Captions
+// }
+
+//GenerateCaption function generates caption from Caption list and tag list
+func GenerateCaption(captions *[]models.Caption, tags *[]models.Tag, captionLength int) []models.Caption {
+	var linePoints [][]float64
+	switch captionLength {
+	case 1:
+		linePoints = CalculatePointShort(captions, tags)
+	// case 2:
+	// 	linePoints = CalculatePointMid(&lines, tags)
+	default:
+		return nil
+	}
+	pl := GetListMaxValue(&linePoints)
+	var result []models.Caption
+	for i := 0; i < len(pl); i++ {
+		var j int
+		var candidate string
+		switch captionLength {
+		case 1:
+			candidate = (*captions)[pl[i].Key.x].Text[pl[i].Key.y]
+			// candidate = lines[pl[i].Key.x][pl[i].Key.y]
+			// case 2:
+			// 	linePoints = CalculatePointMid(&lines, tags)
+		}
+		// else if length==2 {
+		// 	if pl[i].Key.y == 0 {
+		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 2]
+		// 	} else if  pl[i].Key.y == len(lines[pl[i].Key.x])-1 {
+		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y - 2] + ". " + lines[pl[i].Key.x][pl[i].Key.y - 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y]
+		// 	} else {
+		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y - 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 1]
+		// 	}
+		// }
+		// if length == 3 {
+		// 	var temp []string
+		// 	k:=0
+		// 	for k=0 ; ; k++ {
+		// 		candi := lines[pl[k].Key.x][pl[k].Key.y]
+		// 		p:=0
+		// 		for p=0; p < len(temp); p++ {
+		// 			if candi == temp[p] {
+		// 				break
+		// 			}
+		// 		}
+		// 		if p==len(temp) {
+		// 			temp = append(temp,candi)
+		// 		}
+		// 		if len(temp)==26 {
+		// 			break
+		// 		}
+		// 	}
+
+		// 	k = 0
+		// 	for a:=0 ; a<5 ; a++ {
+		// 		var temp1 string
+		// 		for b:=0 ; b<5 ; b++ {
+		// 			temp1 = temp1 + temp[k] + ". "
+		// 			k++
+		// 		}
+		// 		result = append(result, temp1)
+		// 	}
+		// 	return result
+		// }
+		alreadyPresent := false
+		for j = 0; j < len(result); j++ {
+			if candidate == result[j].Text[0] {
+				alreadyPresent = true
+				break
+			}
+		}
+		if !alreadyPresent {
+			candidateCaption := models.Caption{
+				Text:          []string{candidate},
+				Tags:          (*captions)[pl[i].Key.x].Tags,
+				UserGenerated: true,
+			}
+			result = append(result, candidateCaption)
+		}
+		if len(result) == 5 {
+			break
+		}
+	}
+	return result
 }
 
-//GenerateCaption function generates caption from song list and tag list
-func GenerateCaption(songs *[]models.Song, tags *[]models.Tag) string {
-	lines := GetLyricsLines(songs)
-	linePoints := CalculatePoint(&lines, tags)
-	indexX, indexY, _ := GetListMaxValue(&linePoints)
-	//	indexWithTwoLines, valWithTwoLines := GetListMaxValueinTwoLines(&linePoints)
-	if indexY == 0 {
-		return lines[indexX][0] + "\n" + lines[indexX][1] + "\n" + lines[indexX][2]
-	}
-	if indexY == len(lines[indexX])-1 {
-		return lines[indexX][indexY-2] + "\n" + lines[indexX][indexY-1] + "\n" + lines[indexX][indexY]
-	}
-	return lines[indexX][indexY-1] + "\n" + lines[indexX][indexY] + "\n" + lines[indexX][indexY+1]
-}
-
-//CalculatePoint function calculates points of every lines for tags
-func CalculatePoint(lines *[][]string, tags *[]models.Tag) [][]float64 {
-	linePoints := make([][]float64, len(*lines))
-	for index, linesInSong := range *lines {
-		linePoints[index] = make([]float64, len(linesInSong))
+//CalculatePointShort function calculates points of every lines for tags
+func CalculatePointShort(captions *[]models.Caption, tags *[]models.Tag) [][]float64 {
+	linePoints := make([][]float64, len(*captions))
+	for index, caption := range *captions {
+		linePoints[index] = make([]float64, len(caption.Text))
 	}
 	for _, tag := range *tags {
-		for indexX, linesInSong := range *lines {
-			for indexY, line := range linesInSong {
+		for indexX, caption := range *captions {
+			for indexY, line := range caption.Text {
 				if strings.Contains(line, tag.Name) {
 					linePoints[indexX][indexY] += tag.Confidence
 				}
@@ -139,43 +229,45 @@ func CalculatePoint(lines *[][]string, tags *[]models.Tag) [][]float64 {
 }
 
 //GetListMaxValue function gets max value and its index from a float64 matrix
-func GetListMaxValue(vals *[][]float64) (int, int, float64) {
-	var resIndexX, resIndexY int
-	var resVal float64
-	resVal = 0
+func GetListMaxValue(vals *[][]float64) PairList {
+	m := make(map[Index]float64)
 	for indexX, valsLine := range *vals {
 		for indexY, val := range valsLine {
-			if val >= resVal {
-				resVal = val
-				resIndexX = indexX
-				resIndexY = indexY
-			}
+			var index Index = Index{indexX, indexY}
+			m[index] = val
 		}
 	}
-	return resIndexX, resIndexY, resVal
+	pl := make(PairList, len(m))
+	i := 0
+	for k, v := range m {
+		pl[i] = Pair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(pl))
+	return pl
 }
 
-//GetLyricsLines function gets lines from song list
-func GetLyricsLines(songs *[]models.Song) [][]string {
-	allLines := make([][]string, len(*songs))
-	var res [][]string
-	for index, song := range *songs {
-		lines := strings.Split(song.Lyrics, "\n")
-		allLines[index] = lines
-	}
-	for _, lines := range allLines {
-		var tmp []string
-		for _, line := range lines {
-			if len(line) != 0 && line[0] != '[' {
-				tmp = append(tmp, line)
-			}
-		}
-		if len(tmp) != 0 {
-			res = append(res, tmp)
-		}
-	}
-	return res
-}
+//GetCaptionsLines function gets lines from Caption list
+// func GetCaptionsLines(captions *[]models.Caption) [][]string {
+// 	allLines := make([][]string, len(*captions))
+// 	var res [][]string
+// 	for index, caption := range *captions {
+// 		lines := strings.Split(Caption.Lyrics, "\n")
+// 		allLines[index] = lines
+// 	}
+// 	for _, lines := range allLines {
+// 		var tmp []string
+// 		for _, line := range lines {
+// 			if len(line) != 0 && line[0] != '[' {
+// 				tmp = append(tmp, line)
+// 			}
+// 		}
+// 		if len(tmp) != 0 {
+// 			res = append(res, tmp)
+// 		}
+// 	}
+// 	return res
+// }
 
 // getTagsFromImage for /getTagsfromImage endpoint
 func getTagsFromImage(c *gin.Context) {

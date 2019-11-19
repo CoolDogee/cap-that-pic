@@ -72,3 +72,26 @@ After extracting the tags from Azure (Computer Vision) SDK and lyrics from Mongo
 5. Show tags generated from the image in UI
 6. Improve the UI/UX of the application.
 7. Implementation of reCAPTCHA.
+
+### Deployment Guildline
+
+1. Build the image and push it to your docker hub.
+{your_image} format like username/imagename
+```
+docker build . --tag  {your_image} 
+docker push {your_image} 
+```
+2. Create a kubernetes cluster in your google cloud console and export the env variables following:
+```
+export GKE_CLUSTER={your_cluster_name}
+export GKE_CLUSTER_ZONE={your_cluster_name_zone} 
+```
+3. In mongo_deployment.yml and web_deployment.yml, fill kouzoh-p-{your_gcp_project_id}.
+In web_deployment.yml, fill {your_image}, {COMPUTER_VISION_KEY}.
+your_gcp_project_id is the one you register in https://github.com/kouzoh/kouzoh-p-terraform.
+
+4. Run the deploy script
+```
+chmod 755 deploy.sh
+./deploy.sh
+```
