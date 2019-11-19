@@ -13,6 +13,7 @@ import {
   EmailShareButton, EmailIcon,
   RedditShareButton, RedditIcon,
 } from 'react-share';
+import Logo from "../images/capthatpic.png";
 
 function displayHashtags(tags) {
   if (!tags || !tags.length) {
@@ -29,7 +30,8 @@ export const PostPage = () => {
   const [post, setPost] = useState({});
   const [loading, setLoadingstatus] = useState(false);
   const [initialFetch, setInitialFetch] = useState(false);
-
+  // unset imageurl
+  localStorage.removeItem('imageUrl');
 
   const getPost = () => {
     setInitialFetch(true);
@@ -52,12 +54,14 @@ export const PostPage = () => {
           })
           .catch(function (err) {
             setMessage("Caption could not be retrieved :/ Please try reloading")
+            setLoadingstatus(false);
             console.log(err.response);
           });
 
       })
       .catch(function (error) {
         setMessage("No such post found! Are you sure you entered the correct url ?")
+        setLoadingstatus(false);
         console.log(error.response);
       });
   };
@@ -69,16 +73,13 @@ export const PostPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <i className="fas fa-music"></i> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
     </h1>
-      <h4 className="text-center mb-4">
-        {/* <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist> */}
-      </h4>
       <hr></hr>
       {message ? <Message msg={message} /> : null}
       <Container style={{ marginBottom: "5em" }}>
         <Row>
-          {loading ? <Loading /> : null}
+          <Col md="12">{loading ? <Loading /> : null}</Col>
           {/* The image, in its full glory */}
           <Col lg="4">
             <img
@@ -99,44 +100,44 @@ export const PostPage = () => {
             <Row style={{ marginTop: '3em' }}>
               Suggested Hashtags: &nbsp;&nbsp;<span style={{ color: 'blue' }}>{displayHashtags(post.Tags) || "#tag"}</span>
             </Row>
-
-            <Row style={{ marginTop: '3em' }}>
-              Share on social media: &nbsp; &nbsp;
+            {Object.keys(post).length ?
+              <Row style={{ marginTop: '3em' }}>
+                Share on social media: &nbsp; &nbsp;
               <br />
-              <FacebookShareButton url={window.location}
-                quote={caption.Text ? caption.Text[0] : ''} hashtag={displayHashtags(post.Tags)}>
-                <FacebookIcon
-                  size={32}
-                  round />
-              </FacebookShareButton>
-              <TwitterShareButton
-                url={window.location}
-                title={caption.Text ? caption.Text[0] : ''}
-                style={{ marginLeft: "1em" }}>
-                <TwitterIcon size={32} round />
-              </TwitterShareButton>
-              <WhatsappShareButton
-                url={window.location}
-                title={caption.Text ? caption.Text[0] : ''}
-                separator=":: " style={{ marginLeft: "1em" }}>
-                <WhatsappIcon size={32} round />
-              </WhatsappShareButton>
+                <FacebookShareButton url={window.location}
+                  quote={caption.Text ? caption.Text[0] : ''} hashtag={displayHashtags(post.Tags)}>
+                  <FacebookIcon
+                    size={32}
+                    round />
+                </FacebookShareButton>
+                <TwitterShareButton
+                  url={window.location}
+                  title={caption.Text ? caption.Text[0] : ''}
+                  style={{ marginLeft: "1em" }}>
+                  <TwitterIcon size={32} round />
+                </TwitterShareButton>
+                <WhatsappShareButton
+                  url={window.location}
+                  title={caption.Text ? caption.Text[0] : ''}
+                  separator=":: " style={{ marginLeft: "1em" }}>
+                  <WhatsappIcon size={32} round />
+                </WhatsappShareButton>
 
-              <EmailShareButton
-                url={window.location}
-                subject={caption.Text ? caption.Text[0] : ''}
-                body={displayHashtags(post.Tags)} style={{ marginLeft: "1em" }}>
-                <EmailIcon size={32} round />
-              </EmailShareButton>
+                <EmailShareButton
+                  url={window.location}
+                  subject={'Check out this picture on CapThatPic!'}
+                  body={caption.Text ? caption.Text[0] + ' ' + displayHashtags(post.Tags) : displayHashtags(post.Tags)} style={{ marginLeft: "1em" }}>
+                  <EmailIcon size={32} round />
+                </EmailShareButton>
 
-              <RedditShareButton
-                url={window.location}
-                title={caption.Text ? caption.Text[0] : ''}
-                windowWidth={660} windowHeight={460} style={{ marginLeft: "1em" }}>
-                <RedditIcon size={32} round />
-              </RedditShareButton>
-            </Row>
-
+                <RedditShareButton
+                  url={window.location}
+                  title={caption.Text ? '"' + caption.Text[0] + '" by CapThatPic' : 'Check this picture on CapThatPic'}
+                  windowWidth={660} windowHeight={460} style={{ marginLeft: "1em" }}>
+                  <RedditIcon size={32} round />
+                </RedditShareButton>
+              </Row>
+              : null}
             <Row style={{ marginTop: "3em" }}>
               <Col md="3"></Col>
               <Col md="6">

@@ -7,6 +7,7 @@ import Typist from "react-typist";
 import Footer from "./Footer";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaQuoteLeft, FaQuoteRight, FaCheck } from "react-icons/fa";
+import Logo from "../images/capthatpic.png";
 
 function displayHashtags(tags) {
   var tagshash = tags.map(t => '#' + t.replace(" ","_"));
@@ -157,7 +158,7 @@ export const CaptionsPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <i className="fas fa-music"></i> Cap That Pic
+        <img src={Logo} style={{height: "1.5em"}}/> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
         <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist>

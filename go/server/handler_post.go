@@ -60,7 +60,7 @@ func getPostHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "info": ""})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "Get post successfully!", "info": post})
+	c.JSON(http.StatusOK, gin.H{"message": "Get post successfully!", "info": post})
 }
 
 func getCaptionHandler(c *gin.Context) {
@@ -72,5 +72,16 @@ func getCaptionHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "info": ""})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "Get caption successfully!", "info": caption})
+	c.JSON(http.StatusOK, gin.H{"message": "Get caption successfully!", "info": caption})
+}
+
+func getPostsHandler(c *gin.Context) {
+	client := db.ConnectToDB()
+	posts, err := db.GetPosts(client)
+	db.CloseConnectionDB(client)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "info": ""})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Get posts successfully!", "info": posts})
 }
