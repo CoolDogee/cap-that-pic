@@ -81,7 +81,10 @@ func getCaption(c *gin.Context) {
 	captions := db.GetCaptionsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
 
-	c.JSON(200, GenerateCaption(&captions, &tags, captionLength))
+	c.JSON(200, gin.H{
+		"captions": GenerateCaption(&captions, &tags, captionLength),
+		"imageTagsByAzure": tags,
+	})
 }
 
 func getTagsFromRemoteImage(c *gin.Context) {
@@ -96,7 +99,7 @@ func getTagsFromRemoteImage(c *gin.Context) {
 func GetTagFromRemoteImage(remoteImgUrl string) ([]models.Tag, error) {
 	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
 	endpointURL := os.Getenv("ENDPOINT_URL")
-	log.Println(computerVisionKey)
+	// log.Println(computerVisionKey)
 
 	computerVisionClient := computervision.New(endpointURL)
 	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
