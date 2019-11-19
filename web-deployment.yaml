@@ -33,5 +33,9 @@ spec:
            value: kouzoh-p-{your_gcp_project_id}
          - name: SENTRY_DSN
            value: https://1234@sentry.io/1234
+         - name: COMPUTER_VISION_KEY
+           value: {COMPUTER_VISION_KEY}
+         - name: ENDPOINT_URL
+           value: https://capthatpic.cognitiveservices.azure.com/
       restartPolicy: Always
 status: {}
