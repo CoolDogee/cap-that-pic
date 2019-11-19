@@ -77,6 +77,11 @@ func getCaption(c *gin.Context) {
 		return
 	}
 	log.Println(tags)
+	if len(tags)==0 {
+		log.Println("azure SDK returned 0 tags for the image")
+		c.String(500, "azure SDK returned 0 tags for the image")
+		return
+	}
 	client := db.ConnectToDB()
 	captions := db.GetCaptionsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
