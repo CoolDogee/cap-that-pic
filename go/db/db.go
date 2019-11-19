@@ -235,25 +235,29 @@ func AddMovieQuotesToDB(client *mongo.Client) {
 	}
 }
 
-// GetLyricsUsingTags returns list of songs which have atleast one tag in their title
-func GetLyricsUsingTags(client *mongo.Client, tags []models.Tag) []models.Song {
-	var songs []models.Song
+// GetCaptionsUsingTags returns list of captions which have atleast one tag in their title
+func GetCaptionsUsingTags(client *mongo.Client, tags []models.Tag) []models.Caption {
+	var captions []models.Caption
 
 	for i := range tags {
-		songs = append(songs, GetLyricsUsingTag(client, tags[i].Name)...)
+		captions = append(captions, GetCaptionsUsingTag(client, tags[i].Name)...)
 	}
 
-	return songs
+	return captions
 }
 
-// GetLyricsUsingTag return list opf songs which have tag in their title
-func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
-	var songs []models.Song
+// GetCaptionsUsingTag return list opf captions which have tag in their title
+func GetCaptionsUsingTag(client *mongo.Client, tag string) []models.Caption {
+	var captions []models.Caption
 
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
 
-	filter := bson.D{{"lyrics", primitive.Regex{Pattern: tag, Options: ""}}}
+	// filter := bson.M{"$text": bson.M{"$search": tag}}
+	// filter := bson.M{"Text": tag}
+	filter := bson.D{}
+	// filter := bson.M{"Text": primitive.Regex{Pattern: tag, Options: "i"}}
+	// filter := bson.M{"Text": primitive.Regex{Pattern: tag, Options: "i"}}
 	cursor, err := collection.Find(ctx, filter)
 
 	if err != nil {
@@ -262,18 +266,26 @@ func GetLyricsUsingTag(client *mongo.Client, tag string) []models.Song {
 	} else {
 		log.Println("Find() API result:", cursor)
 		for cursor.Next(ctx) {
-			var result models.Song
+			var result models.Caption
 			err = cursor.Decode(&result)
-
-			if err != nil {
-				log.Println("cursor.Next() error: ", err)
-			} else {
-				songs = append(songs, result)
+			tagPresent := false
+			for _, line := range result.Text {
+				if strings.Contains(line, tag){
+					tagPresent = true
+					break
+				}
+			}
+			if tagPresent {
+				if err != nil {
+					log.Println("cursor.Next() error: ", err)
+				} else {
+					captions = append(captions, result)
+				}
 			}
 		}
 	}
-
-	return songs
+	log.Println("!!!!!!!!!!!!!!!!", captions)
+	return captions
 }
 
 // SetupDB adds lyrics to DB
@@ -284,8 +296,8 @@ func SetupDB() {
 	log.Println("Added lyrics to DB successfully.")
 	AddPoemsToDB(client)
 	log.Println("Added poems to DB successfully.")
-	AddMovieQuotesToDB(client)
-	log.Println("Added movie quotes to DB successfully.")
+	// AddMovieQuotesToDB(client)
+	// log.Println("Added movie quotes to DB successfully.")
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
