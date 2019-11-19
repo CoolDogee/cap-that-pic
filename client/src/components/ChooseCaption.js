@@ -10,10 +10,14 @@ import { FaQuoteLeft, FaQuoteRight, FaCheck } from "react-icons/fa";
 import Logo from "../images/capthatpic.png";
 
 function displayHashtags(tags) {
-  var tagshash = tags.map(t => '#' + t.replace(" ","_"));
+  if (!tags || !tags.length) {
+    return '';
+  }
+  var tagshash = tags.map(t => '#' + t.split(" ").join("_"));
 
   return tagshash.join(', ');
 }
+
 export const CaptionsPage = () => {
   const [message, setMessage] = useState("");
   const [chosenCaption, setCaption] = useState({});
@@ -21,7 +25,7 @@ export const CaptionsPage = () => {
   // TODO
   const [filter, setFilter] = useState("");
   const [generatedCaptions, setGeneratedCaptions] = useState([]);
-  const [loading, setLoadingstatus] = useState(false);
+  const [loading, setLoadingstatus] = useState(true);
   const [initialFetch, setInitialFetch] = useState(false);
 
   const onChangeCaption = e => {
@@ -31,38 +35,11 @@ export const CaptionsPage = () => {
     delayMessage("");
   };
 
-  // temporary data
-  const tempData = [
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-  ];
-
-  const tempTags = ["cool", "chill"];
-
   const onSubmit = async e => {
     e.preventDefault();
+    console.log(chosenCaption);
 
-    var postCaption = chosenCaption;
-    postCaption.UserGenerated = true;
-
-    axios.post(API_URL + '/api/v1/caption', {
-      Text: [chosenCaption.Text],
-      Src : chosenCaption.Src || "",
-      Mood: chosenCaption.Mood || [],
-      Tags: chosenCaption.Tags || [],
-      Type: chosenCaption.Type || "",
-      UserGenerated: true 
-    })
+    axios.post(API_URL + '/api/v1/caption', chosenCaption)
       .then(function (response) {
         console.log("caption made");
         console.log(response.data.info);
@@ -122,33 +99,21 @@ export const CaptionsPage = () => {
   // const getCaptions = async() => {
   const getCaptions = () => {
     setInitialFetch(true);
-    try {
-      setLoadingstatus(true);
-      // const res = await axios.get(API_URL + "/api/v1/getcaption", {
-      //   params: { fileName: localStorage.getItem("imageUrl") }
-      // });
-      var res = {
-        status: 200,
-        data: { captions: tempData, tags: tempTags },
-      };
-      setLoadingstatus(false);
-      if (res.status === 200) {
-        setGeneratedCaptions(res.data.captions);
-        setHashtags(res.data.tags);
-        console.log(res.data);
-        setMessage("Choose a caption that you like!");
-        // disappear message after a while
-        delayMessage("");
-      }
-    } catch (err) {
-      // console.log(err.response);
-      // if (err.response.status === 500) {
-      //   setMessage("Internal Server Error!");
-      // } else {
-      //   setMessage(err.response.data);
-      // }
-      delayMessage("Server seems to be down. Please try after some time.");
-    }
+    setLoadingstatus(true);
+    axios.get(API_URL + '/api/v1/getcaption', {
+      params: { fileName: localStorage.getItem('imageUrl'), length: 1 }
+    })
+      .then(function (response) {
+        console.log('Captions found');
+        console.log(response.data);
+        setGeneratedCaptions(response.data);
+
+      })
+      .catch(function (error) {
+        setMessage("No captions could be generated!");
+        console.log(error.response);
+      });
+    setLoadingstatus(false);
   };
 
   if (!initialFetch) {
@@ -158,7 +123,7 @@ export const CaptionsPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <img src={Logo} style={{height: "1.5em"}}/> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
         <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist>
@@ -198,20 +163,20 @@ export const CaptionsPage = () => {
 
           {/* Filter options, and caption menu */}
           <Col lg="8" md="12">
-            {loading ? <Loading /> : null}
             {/* Add filters here */}
             <Row >
               <Col lg="12"><span style={{ fontFamily: "sans-serif", fontWeight: "500" }}>
                 Displaying Top 10 captions for your image
                   </span></Col>
-              {generatedCaptions.map((caption) =>
+              {Object.keys(generatedCaptions).length || loading ? 
+              generatedCaptions.map((caption) =>
                 <Col lg="12" style={{ marginTop: "1.5em" }}>
                   <Card>
                     <Card.Body>
-                      <Button variant="primary" style={{ float: "right" }} onClick={(e) => {onChangeCaption(caption)}}><FaCheck /></Button>
+                      <Button variant="primary" style={{ float: "right" }} onClick={(e) => { onChangeCaption(caption) }}><FaCheck /></Button>
 
                       <Card.Title style={{ fontStyle: "italic" }}>
-                        <FaQuoteLeft style={{ height: "0.5em", marginTop:"-0.7em"}} />
+                        <FaQuoteLeft style={{ height: "0.5em", marginTop: "-0.7em" }} />
                         {caption.Text}
                         <FaQuoteRight style={{ height: "0.5em", marginTop: "-0.7em" }} />
                       </Card.Title>
@@ -219,7 +184,7 @@ export const CaptionsPage = () => {
                     </Card.Body>
                   </Card>
                 </Col>
-              )}
+              ): <Loading />}
             </Row>
 
           </Col>

@@ -19,7 +19,7 @@ function displayHashtags(tags) {
   if (!tags || !tags.length) {
     return '';
   }
-  var tagshash = tags.map(t => '#' + t.replace(" ", "_"));
+  var tagshash = tags.map(t => '#' + t.split(" ").join("_"));
 
   return tagshash.join(', ');
 }
@@ -89,7 +89,7 @@ export const PostPage = () => {
             />
           </Col>
           <Col lg="1"></Col>
-          <Col lg="6" md="12">
+          <Col lg="7" md="12">
             <Row style={{ marginTop: '3em' }}></Row>
             <Row style={{ fontStyle: "italic", fontSize: "3em", align: "center" }} className="text-muted">
               <FaQuoteLeft style={{ height: "0.5em" }} />
@@ -112,13 +112,13 @@ export const PostPage = () => {
                 </FacebookShareButton>
                 <TwitterShareButton
                   url={window.location}
-                  title={caption.Text ? caption.Text[0] : ''}
+                  title={caption.Text ? caption.Text[0] + ' ' + displayHashtags(post.Tags) : displayHashtags(post.Tags)}
                   style={{ marginLeft: "1em" }}>
                   <TwitterIcon size={32} round />
                 </TwitterShareButton>
                 <WhatsappShareButton
                   url={window.location}
-                  title={caption.Text ? caption.Text[0] : ''}
+                  title={caption.Text ? caption.Text[0] + ' ' + displayHashtags(post.Tags) : displayHashtags(post.Tags)}
                   separator=":: " style={{ marginLeft: "1em" }}>
                   <WhatsappIcon size={32} round />
                 </WhatsappShareButton>
