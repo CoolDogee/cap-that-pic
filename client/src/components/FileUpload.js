@@ -5,7 +5,7 @@ import axios from "axios";
 import { API_URL } from "../config";
 import Typist from "react-typist";
 import Footer from "./Footer";
-
+import Logo from "../images/capthatpic.png";
 
 export const FileUpload = () => {
   const [message, setMessage] = useState("");
@@ -49,7 +49,7 @@ export const FileUpload = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <i className="fas fa-music"></i> Cap That Pic
+        <img src={Logo} style={{height: "1.5em"}}/> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
         <Typist> Every Picture Deserves The Perfect Caption</Typist>

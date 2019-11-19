@@ -289,7 +289,7 @@ func SetupDB() {
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
-	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
+	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
 	_, err := collection.InsertOne(context.TODO(), *caption)
 	return err
 }
@@ -302,7 +302,7 @@ func AddPostToDB(client *mongo.Client, post *models.Post) error {
 
 func GetCaptionByID(client *mongo.Client, id string) (*models.Caption, error) {
 	var result models.Caption
-	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
+	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
 	objID, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.D{{"_id", objID}}
 
@@ -319,4 +319,28 @@ func GetPostByID(client *mongo.Client, id string) (*models.Post, error) {
 
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	return &result, err
+}
+
+func GetPosts(client *mongo.Client) (*[]models.PostWithCaption, error) {
+	var results []models.PostWithCaption
+	collection := client.Database("CAP-THAT-PIC").Collection("Post")
+	cur, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return &results, err
+	}
+
+	for cur.Next(context.TODO()) {
+		var tmp models.PostWithCaption
+		err := cur.Decode(&tmp)
+		if err != nil {
+			return &results, err
+		}
+		cap, err := GetCaptionByID(client, tmp.CaptionID)
+		if err != nil {
+			return &results, err
+		}
+		tmp.Caption = *cap
+		results = append(results, tmp)
+	}
+	return &results, err
 }

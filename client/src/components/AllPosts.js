@@ -3,103 +3,76 @@ import Message from "./Message";
 import Loading from "./Loading";
 import axios from "axios";
 import { API_URL } from "../config";
-import Typist from "react-typist";
+import Footer from "./Footer";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import Logo from "../images/capthatpic.png";
+
+function displayHashtags(tags) {
+  if (!tags || !tags.length) {
+    return '';
+  }
+  var tagshash = tags.map(t => '#' + t.replace(" ", "_"));
+
+  return tagshash.join(', ');
+}
 
 export const AllPostsPage = () => {
   const [message, setMessage] = useState("");
-  const [url, setUrl] = useState("");
-  const [captions, setCaption] = useState([]);
-  const [status, setStatus] = useState(false);
-  const [secstatus, setSecStatus] = useState(false);
-  const [tristatus, setTriStatus] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoadingstatus] = useState(false);
+  const [initialFetch, setInitialFetch] = useState(false);
 
-  const onChange = e => {
-    setUrl(e.target.value);
-    setStatus(true);
-    setTriStatus(false);
-  };
-
-  const onSubmit = async e => {
-    e.preventDefault();
-    setSecStatus(true);
-
-    try {
-      const res = await axios.get("http://google.com", {//API_URL + "/api/v1/getcaption", {
-        params: { fileName: url }
+  const getPosts = () => {
+    setInitialFetch(true);
+    setLoadingstatus(true);
+    axios.get(API_URL + '/api/v1/posts')
+      .then(function (response) {
+        console.log('Received posts');
+        console.log(response.data.info);
+        setPosts(response.data.info);
+      })
+      .catch(function (error) {
+        console.log("Could not fetch posts!");
+        setMessage("Could not fetch posts!");
+        console.log(error.response);
       });
-
-      if (res.status === 200) {
-        // const capLines = res.data.split("\n");
-        // setCaption(capLines);
-        // setSecStatus(false);
-        // setTriStatus(true);
-        localStorage.setItem("imageUrl", this.state.url);
-      }
-    } catch (err) {
-      if (err.response.status === 500) {
-        console.log(err.response);
-        setMessage("Internal Server Error!");
-      } else {
-        setMessage(err.response.data.message);
-      }
-    }
+    setLoadingstatus(false);
   };
+
+  if (!initialFetch) {
+    getPosts();
+  }
 
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <i className="fas fa-music"></i> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
-        <Typist> Every Picture Deserves The Perfect Caption</Typist>
+        <a href="/">Caption your own photo!</a>
+        {/* <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist> */}
       </h4>
       <hr></hr>
       {message ? <Message msg={message} /> : null}
-      <div className="custom-file mb-4 mt-5">
-        <input
-          type="text"
-          className="form-control"
-          id="exampleFormControlInput1"
-          placeholder="Please Enter an Image URL"
-          onChange={onChange}
-        ></input>
-      </div>
-      {setUrl ? (
-        <div className="row mt-5">
-          <div className="col-md-6 m-auto">
-            <img
-              style={{ width: "100%" }}
-              src={url}
-              className="img-fluid"
-              alt=""
-            />
-          </div>
-        </div>
-      ) : null}
-      {secstatus ? <Loading /> : null}
-      {tristatus ? (
-        <div className="row mt-5 mb-5">
-          <div className="col-md-8 m-auto text-center">
-            <h4>{captions[0]}</h4>
-            <h4>{captions[1]}</h4>
-            <h4>{captions[2]}</h4>
-          </div>
-        </div>
-      ) : null}
-      {status ? (
-        <div
-          className="mt-5 mb-5 text-center"
-          style={{ paddingBottom: "100px" }}
-        >
-          <form onSubmit={onSubmit}>
-            <input
-              type="submit"
-              value="Generate Caption"
-              className="btn btn-secondary btn-lg"
-            />
-          </form>
-        </div>
-      ) : null}
+      <Container style={{ marginBottom: "5em" }}>
+        <Row>
+          <Col md="12">{loading ? <Loading /> : null}</Col>
+          {posts.map((post) =>
+            <Col md="4" style={{ marginBottom: "2em" }}>
+              <a href={"/i/" + post.ID}>
+                <Card>
+                  <Card.Img variant="top" src={post.ImgURL || "holder.js/100px180"} style={{ height: "400px", width: "auto" }} />
+                  <Card.Body>
+                    <Card.Title>{post.Caption.Text[0] || "caption"}</Card.Title>
+                    <Card.Text className="text-muted">{displayHashtags(post.Tags)}</Card.Text>
+                  </Card.Body>
+                </Card>
+              </a>
+            </Col>
+          )}
+        </Row>
+      </Container>
+      <Footer />
     </Fragment>
   );
 };

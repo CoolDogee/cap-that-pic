@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 
 import { CaptionsPage } from "./components/ChooseCaption";
 import { PostPage } from "./components/Post";
-// import { AllPostsPage } from "./components/AllPosts";
+import { AllPostsPage } from "./components/AllPosts";
 import { FileUpload } from "./components/FileUpload";
 import EmptyLayout from "./components/EmptyLayout";
 
@@ -29,8 +29,9 @@ export default [
         layout: EmptyLayout,
         component: PostPage
     },
-    // {
-    //     path: "/posts",
-    //     component: AllPostsPage
-    // }
+    {
+        path: "/posts",
+        layout: EmptyLayout,
+        component: AllPostsPage
+    }
 ];
