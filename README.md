@@ -79,6 +79,7 @@ After extracting the tags from Azure (Computer Vision) SDK and lyrics from Mongo
 {your_image} format like username/imagename
 ```
 docker build . --tag  {your_image} 
+docker push {your_image} 
 ```
 2. Create a kubernetes cluster in your google cloud console and export the env variables following:
 ```
