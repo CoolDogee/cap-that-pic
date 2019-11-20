@@ -66,8 +66,9 @@ export const PostPage = () => {
   const [post, setPost] = useState({});
   const [loading, setLoadingstatus] = useState(false);
   const [initialFetch, setInitialFetch] = useState(false);
-  // unset imageurl
+  // unset local variables
   localStorage.removeItem('imageUrl');
+  localStorage.removeItem('length');
 
   const getPost = () => {
     setInitialFetch(true);

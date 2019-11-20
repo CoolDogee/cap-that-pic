@@ -7,6 +7,8 @@ import Typist from "react-typist";
 import Footer from "./Footer";
 import Logo from "../images/capthatpic.png";
 import { Row, Col } from "react-bootstrap";
+import Slider from "rc-slider";
+import 'rc-slider/assets/index.css';
 
 export const FileUpload = () => {
   const [message, setMessage] = useState("");
@@ -14,9 +16,14 @@ export const FileUpload = () => {
   const [status, setStatus] = useState(false);
   const [loadingstatus, setLoadingstatus] = useState(false);
 
-  const onChange = e => {
+  const onChangeUrl = e => {
     setUrl(e.target.value);
     setStatus(true);
+  };
+
+  const onChangeLength = e => {
+    const valToLength = {1: 1, 50: 2, 100: 3};
+    localStorage.setItem("length", valToLength[e.value]);
   };
 
   const onSubmit = async e => {
@@ -63,7 +70,7 @@ export const FileUpload = () => {
           className="form-control"
           id="exampleFormControlInput1"
           placeholder="Please Enter an Image URL"
-          onChange={onChange}
+          onChange={onChangeUrl}
         ></input>
       </div>
       {setUrl ? (
@@ -84,6 +91,15 @@ export const FileUpload = () => {
           className="mt-5 mb-5 text-center"
           style={{ paddingBottom: "100px" }}
         >
+          <Row style={{marginBottom: "1em"}}>
+            <Col md="12">Choose caption length</Col>
+            <Col md="3"></Col>
+            <Col md="6">
+              <Slider min={1} defaultValue={1} marks={{ 1: "Low", 50: "Medium", 100:  "High"}}
+              step={null} handle={onChangeLength}/>
+            </Col>
+          </Row>
+          <br />
           <form onSubmit={onSubmit}>
             <input
               type="submit"
@@ -94,8 +110,8 @@ export const FileUpload = () => {
         </div>
       ) : null}
       <Row style={{ marginTop: "2em", marginBottom: "5em" }}>
-        <Col md="6"></Col>
-        <Col md="6">
+        <Col md="4"></Col>
+        <Col md="3">
           <span style={{ textAlign: "center" }}><a href="/posts">See sample posts</a></span>
         </Col>
       </Row>

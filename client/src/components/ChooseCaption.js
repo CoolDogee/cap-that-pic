@@ -20,6 +20,10 @@ function displayHashtags(tags) {
   return tagshash.join(', ');
 }
 
+function readableNum(num) {
+  return Math.round(num * 100) / 100
+}
+
 const NONE = [
   1, 0, 0, 0, 0,
   0, 1, 0, 0, 0,
@@ -30,14 +34,13 @@ const NONE = [
 export const CaptionsPage = () => {
   const [message, setMessage] = useState("");
   const [chosenCaption, setCaption] = useState({});
-  const [hashtags, setHashtags] = useState([]);
-  // TODO
   const [values, setValues] = useState([...NONE]);
   const [filter, setFilter] = useState(values);
   const [applyFilter, setApplyFilter] = useState(true);
   const [colorOne, setColorOne] = useState(null);
   const [colorTwo, setColorTwo] = useState(null);
   const [generatedCaptions, setGeneratedCaptions] = useState([]);
+  const [tags, setTags] = useState([]);
   const [loading, setLoadingstatus] = useState(true);
   const [initialFetch, setInitialFetch] = useState(false);
 
@@ -49,13 +52,13 @@ export const CaptionsPage = () => {
   };
 
   const getFilterString = (fil, colOne, colTwo) => {
-    if(colOne === [250, 50, 50] && colTwo === [20, 20, 100]) {
+    if (colOne === [250, 50, 50] && colTwo === [20, 20, 100]) {
       return "Duotone (red / blue)";
-    } else if(colOne === [50, 250, 50] && colTwo === [250, 20, 220]) {
+    } else if (colOne === [50, 250, 50] && colTwo === [250, 20, 220]) {
       return "Duotone (green / purple)";
-    } else if(colOne === [40, 250, 250] && colTwo === [250, 150, 30]) {
+    } else if (colOne === [40, 250, 250] && colTwo === [250, 150, 30]) {
       return "Duotone (light blue/orange)";
-    } else if (colOne === [40, 70, 200] && colTwo ===  [220, 30, 70]) {
+    } else if (colOne === [40, 70, 200] && colTwo === [220, 30, 70]) {
       return "Duotone (blue / red)";
     }
     return typeof fil === 'string' ? fil : 'none';
@@ -77,7 +80,7 @@ export const CaptionsPage = () => {
           ImgURL: localStorage.getItem('imageUrl'),
           CaptionID: captionID,
           Filter: getFilterString(filter, colorOne, colorTwo),
-          Tags: chosenCaption.Tags.concat(hashtags)
+          Tags: chosenCaption.Tags.concat(tags.map((tag) => tag.Name))
         })
           .then(function (resp) {
             // successful post creation
@@ -124,12 +127,14 @@ export const CaptionsPage = () => {
     setInitialFetch(true);
     setLoadingstatus(true);
     axios.get(API_URL + '/api/v1/getcaption', {
-      params: { fileName: localStorage.getItem('imageUrl'), length: 1 }
+      params: { fileName: localStorage.getItem('imageUrl'), 
+                length: localStorage.getItem('length') || 1 }
     })
       .then(function (response) {
         console.log('Captions found');
         console.log(response.data);
-        setGeneratedCaptions(response.data);
+        setGeneratedCaptions(response.data.captions);
+        setTags(response.data.imageTagsByAzure);
 
       })
       .catch(function (error) {
@@ -177,7 +182,7 @@ export const CaptionsPage = () => {
               colorOne={colorOne} colorTwo={colorTwo}
               onChange={(m) => { setValues(m) }}
             />
-            <Card>
+            <Card style={{ marginTop: "1em" }}>
               <Card.Body>
                 <Card.Title>
                   Caption
@@ -196,6 +201,23 @@ export const CaptionsPage = () => {
                 />
               </form>
               : null}
+            {tags.length ?
+              <Card style={{ marginTop: "1em" }}>
+                <Card.Body>
+                  <Card.Title>
+                    Tags identified
+              </Card.Title>
+                  <Card.Text>
+                    <b>Tag <span style={{ float: "right" }}>Confidence</span><br /></b>
+                    {tags.map((tag) =>
+                      <div>
+                        {tag.Name}<span style={{ float: "right" }}>{readableNum(tag.Confidence)}</span><br />
+                      </div>
+                    )}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+              : null}
           </Col>
 
           {/* Filter options, and caption menu */}
@@ -207,36 +229,36 @@ export const CaptionsPage = () => {
                 Choose filters
                 <Row style={{ marginTop: "0.3em" }}>
                   <Col md="2"><Button variant="secondary"
-                  onClick={(e) => { ButtonFilter(e, NONE, NONE, null, null)}}>None
+                    onClick={(e) => { ButtonFilter(e, NONE, NONE, null, null) }}>None
                   </Button></Col>
 
                   <Col md="2"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'invert', null, null, null)}}> Invert
+                    onClick={(e) => { ButtonFilter(e, 'invert', null, null, null) }}> Invert
                   </Button></Col>
 
                   <Col md="2"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'grayscale', null, null, null)}}> Grayscale
+                    onClick={(e) => { ButtonFilter(e, 'grayscale', null, null, null) }}> Grayscale
                   </Button></Col>
-                
+
                   <Col md="2"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'sepia', null, null, null)}}> Sepia
+                    onClick={(e) => { ButtonFilter(e, 'sepia', null, null, null) }}> Sepia
                   </Button></Col>
-                  
+
                   <Col md="4"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [250, 50, 50], [20, 20, 100])}}> Duotone (red / blue)
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [250, 50, 50], [20, 20, 100]) }}> Duotone (red / blue)
                   </Button></Col>
                 </Row>
-                <Row style={{marginTop: "1em"}}>
+                <Row style={{ marginTop: "1em" }}>
                   <Col md="4"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [50, 250, 50], [250, 20, 220])}}> Duotone (green / purple)
-                  </Button></Col>
-                  
-                  <Col md="4"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 250, 250], [250, 150, 30])}}> Duotone (light blue/orange)
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [50, 250, 50], [250, 20, 220]) }}> Duotone (green / purple)
                   </Button></Col>
 
                   <Col md="4"><Button variant="secondary"
-                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 70, 200], [220, 30, 70])}}> Duotone (blue / red)
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 250, 250], [250, 150, 30]) }}> Duotone (light blue/orange)
+                  </Button></Col>
+
+                  <Col md="4"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 70, 200], [220, 30, 70]) }}> Duotone (blue / red)
                   </Button></Col>
 
                 </Row>
