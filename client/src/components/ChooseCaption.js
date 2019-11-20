@@ -51,11 +51,15 @@ export const CaptionsPage = () => {
     delayMessage("");
   };
 
-  const filterNames = ['invert', 'grayscale', 'sepia'];
+  const filterNames = ['none', 'invert', 'grayscale', 'sepia'];
 
   const getFilterString = (fil, colOne, colTwo) => {
     console.log('Got for detection');
-    console.log(colOne, colTwo);
+    console.log(fil, colOne, colTwo);
+
+    if(typeof fil !== 'string') {
+      fil = 'none';
+    }
     if (filterNames.includes(fil)) {
       return fil;
     }
@@ -68,7 +72,7 @@ export const CaptionsPage = () => {
     } else if (JSON.stringify(colOne) === JSON.stringify([40, 70, 200]) && JSON.stringify(colTwo) === JSON.stringify([220, 30, 70])) {
       return "Duotone (blue / red)";
     }
-    return typeof fil === 'string' ? fil : 'none';
+    return 'none';
   }
 
   const onSubmit = async e => {
@@ -176,7 +180,7 @@ export const CaptionsPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} alt=""/> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
         <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist>
