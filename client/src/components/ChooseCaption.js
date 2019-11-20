@@ -52,13 +52,15 @@ export const CaptionsPage = () => {
   };
 
   const getFilterString = (fil, colOne, colTwo) => {
-    if (colOne === [250, 50, 50] && colTwo === [20, 20, 100]) {
+    console.log('Got for detection');
+    console.log(colOne, colTwo);
+    if (JSON.stringify(colOne) === JSON.stringify([250, 50, 50]) && JSON.stringify(colTwo) === JSON.stringify([20, 20, 100])) {
       return "Duotone (red / blue)";
-    } else if (colOne === [50, 250, 50] && colTwo === [250, 20, 220]) {
+    } else if (JSON.stringify(colOne) === JSON.stringify([50, 250, 50]) && JSON.stringify(colTwo) === JSON.stringify([250, 20, 220])) {
       return "Duotone (green / purple)";
-    } else if (colOne === [40, 250, 250] && colTwo === [250, 150, 30]) {
+    } else if (JSON.stringify(colOne) === JSON.stringify([40, 250, 250]) &&JSON.stringify(colTwo) ===JSON.stringify([250, 150, 30])) {
       return "Duotone (light blue/orange)";
-    } else if (colOne === [40, 70, 200] && colTwo === [220, 30, 70]) {
+    } else if (JSON.stringify(colOne) === JSON.stringify([40, 70, 200]) && JSON.stringify(colTwo) === JSON.stringify([220, 30, 70])) {
       return "Duotone (blue / red)";
     }
     return typeof fil === 'string' ? fil : 'none';
@@ -75,6 +77,7 @@ export const CaptionsPage = () => {
         var captionID = response.data.info;
         // caption created successfully
 
+        console.log('Setting filter');
         console.log(getFilterString(filter, colorOne, colorTwo));
         axios.post(API_URL + '/api/v1/post', {
           ImgURL: localStorage.getItem('imageUrl'),
@@ -151,6 +154,8 @@ export const CaptionsPage = () => {
   // reflect change in filter
   const ButtonFilter = (e, fil, val, colOne, colTwo) => {
     e.preventDefault();
+    console.log("Changing filters");
+    console.log({filter: fil, colOne: colOne, colTwo: colTwo});
     setApplyFilter(true); setFilter(fil);
     if (val) {
       setValues(val);
