@@ -125,8 +125,9 @@ func AddLyricsToDB(client *mongo.Client) {
 	// }
 
 	for _, song := range songs {
+		lyricsWithoutEmptyLines := removeEmptyLines(strings.Split(song["lyrics"].(string), "\n"))
 		caption := models.Caption{
-			Text:          strings.Split(song["lyrics"].(string), "\n"),
+			Text:          lyricsWithoutEmptyLines,
 			Src:           song["chartURL"].(string),
 			Type:          "song",
 			Tags:          []string{song["artist"].(string)},
@@ -140,6 +141,16 @@ func AddLyricsToDB(client *mongo.Client) {
 			log.Println("InsertOne() API result:", result)
 		}
 	}
+}
+
+func removeEmptyLines(text []string) []string {
+	var textWithoutEmptyLines []string
+	for _, line := range text {
+		if len(line)>0 && line[0]!='[' {
+			textWithoutEmptyLines = append(textWithoutEmptyLines, line)
+		}
+	}
+	return textWithoutEmptyLines
 }
 
 // AddPoemsToDB adds poems to mongodb database
@@ -181,7 +192,10 @@ func AddPoemsToDB(client *mongo.Client) {
 		}
 		caption.ID = primitive.NewObjectID()
 		for _, line := range poem["text"].([]interface{}) {
-			caption.Text = append(caption.Text, line.(string))
+			text := line.(string)
+			if len(text)>0 && text[0]!='[' {
+				caption.Text = append(caption.Text, text)
+			}
 		}
 		for _, tag := range poem["keywords"].([]interface{}) {
 			caption.Tags = append(caption.Tags, tag.(string))
