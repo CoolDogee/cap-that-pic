@@ -82,7 +82,7 @@ func AddLyricsToDB(client *mongo.Client) {
 	var caption models.Caption
 	filter := bson.M{"type": "song"}
 	err := collection.FindOne(ctx, filter).Decode(&caption)
-	log.Println(caption)
+	// log.Println(caption)
 	if err==nil {
 		return
 	}
@@ -151,7 +151,7 @@ func AddPoemsToDB(client *mongo.Client) {
 	var caption models.Caption
 	filter := bson.M{"type": "poem"}
 	err := collection.FindOne(ctx, filter).Decode(&caption)
-	log.Println(caption)
+	// log.Println(caption)
 	if err==nil {
 		return
 	}
@@ -264,7 +264,7 @@ func GetCaptionsUsingTag(client *mongo.Client, tag string) []models.Caption {
 		log.Println("Find ERROR:", err)
 		defer cursor.Close(ctx)
 	} else {
-		log.Println("Find() API result:", cursor)
+		// log.Println("Find() API result:", cursor)
 		for cursor.Next(ctx) {
 			var result models.Caption
 			err = cursor.Decode(&result)
@@ -284,13 +284,13 @@ func GetCaptionsUsingTag(client *mongo.Client, tag string) []models.Caption {
 			}
 		}
 	}
-	log.Println("!!!!!!!!!!!!!!!!", captions)
+	// log.Println("!!!!!!!!!!!!!!!!", captions)
 	return captions
 }
 
 // SetupDB adds lyrics to DB
 func SetupDB() {
-	log.Println("Add lyrics to DB...")
+	// log.Println("Add lyrics to DB...")
 	client := ConnectToDB()
 	AddLyricsToDB(client)
 	log.Println("Added lyrics to DB successfully.")

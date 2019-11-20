@@ -45,7 +45,12 @@ func (p PairList) Len() int           { return len(p) }
 func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-var computerVisionContext context.Context
+var (
+	computerVisionContext context.Context
+	midCaptionLines =  3
+	longCaptionLines = 5
+	numberOfResultsToReturn = 10
+)
 
 func hello(c *gin.Context) {
 	c.String(200, "Hello World")
@@ -57,7 +62,12 @@ func getCaption(c *gin.Context) {
 	captionLength, err := strconv.Atoi(c.Request.URL.Query().Get("length"))
 	if err != nil {
 		log.Println("Get caption length ERROR: ", err)
-		c.String(400, "invalid captiion size")
+		c.String(400, "invalid caption size")
+		return
+	}
+	if captionLength<1 || captionLength>3 {
+		log.Println("caption length  error: expected 1-3, given ", captionLength)
+		c.String(400, "invalid caption length")
 		return
 	}
 	tags, err := GetTagFromRemoteImage(img)
@@ -67,11 +77,19 @@ func getCaption(c *gin.Context) {
 		return
 	}
 	log.Println(tags)
+	if len(tags)==0 {
+		log.Println("azure SDK returned 0 tags for the image")
+		c.String(500, "azure SDK returned 0 tags for the image")
+		return
+	}
 	client := db.ConnectToDB()
 	captions := db.GetCaptionsUsingTags(client, tags)
 	db.CloseConnectionDB(client)
 
-	c.JSON(200, GenerateCaption(&captions, &tags, captionLength))
+	c.JSON(200, gin.H{
+		"captions": GenerateCaption(&captions, &tags, captionLength),
+		"imageTagsByAzure": tags,
+	})
 }
 
 func getTagsFromRemoteImage(c *gin.Context) {
@@ -86,7 +104,7 @@ func getTagsFromRemoteImage(c *gin.Context) {
 func GetTagFromRemoteImage(remoteImgUrl string) ([]models.Tag, error) {
 	computerVisionKey := os.Getenv("COMPUTER_VISION_KEY")
 	endpointURL := os.Getenv("ENDPOINT_URL")
-	log.Println(computerVisionKey)
+	// log.Println(computerVisionKey)
 
 	computerVisionClient := computervision.New(endpointURL)
 	computerVisionClient.Authorizer = autorest.NewCognitiveServicesAuthorizer(computerVisionKey)
@@ -114,80 +132,32 @@ func TagRemoteImage(client computervision.BaseClient, remoteImageURL string) ([]
 	return tags, nil
 }
 
-//********** Use API get tags of an image Here ***************
-// func getTagsOfImage(url string) []models.Tag {
-// 	tags := data.Tag(-1, 0).List
-// 	return tags
-// }
-
-//********** Use DB get lyrics from tags Here ***************
-// func getLyricsFromTags(tags *[]models.Tag) []models.Caption {
-// 	Captions := data.Caption(-1, 0).List
-// 	return Captions
-// }
-
 //GenerateCaption function generates caption from Caption list and tag list
 func GenerateCaption(captions *[]models.Caption, tags *[]models.Tag, captionLength int) []models.Caption {
 	var linePoints [][]float64
-	switch captionLength {
-	case 1:
-		linePoints = CalculatePointShort(captions, tags)
-	// case 2:
-	// 	linePoints = CalculatePointMid(&lines, tags)
-	default:
-		return nil
-	}
+	linePoints = CalculatePoint(captions, tags, captionLength)
 	pl := GetListMaxValue(&linePoints)
 	var result []models.Caption
 	for i := 0; i < len(pl); i++ {
 		var j int
 		var candidate string
-		switch captionLength {
-		case 1:
+		var numLinesInCaption int
+		if captionLength==1 {
 			candidate = (*captions)[pl[i].Key.x].Text[pl[i].Key.y]
-			// candidate = lines[pl[i].Key.x][pl[i].Key.y]
-			// case 2:
-			// 	linePoints = CalculatePointMid(&lines, tags)
+		} else {
+			numLinesInCaption = midCaptionLines
+			if captionLength==3 {
+				numLinesInCaption = longCaptionLines
+			}
+			if pl[i].Value==0.0 {
+				continue
+			}
+			candidate = (*captions)[pl[i].Key.x].Text[pl[i].Key.y]
+			for count:=1; count<numLinesInCaption; count++ {
+				candidate += ". "
+				candidate += (*captions)[pl[i].Key.x].Text[pl[i].Key.y + count]
+			}
 		}
-		// else if length==2 {
-		// 	if pl[i].Key.y == 0 {
-		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 2]
-		// 	} else if  pl[i].Key.y == len(lines[pl[i].Key.x])-1 {
-		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y - 2] + ". " + lines[pl[i].Key.x][pl[i].Key.y - 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y]
-		// 	} else {
-		// 		candidate = lines[pl[i].Key.x][pl[i].Key.y - 1] + ". " + lines[pl[i].Key.x][pl[i].Key.y] + ". " + lines[pl[i].Key.x][pl[i].Key.y + 1]
-		// 	}
-		// }
-		// if length == 3 {
-		// 	var temp []string
-		// 	k:=0
-		// 	for k=0 ; ; k++ {
-		// 		candi := lines[pl[k].Key.x][pl[k].Key.y]
-		// 		p:=0
-		// 		for p=0; p < len(temp); p++ {
-		// 			if candi == temp[p] {
-		// 				break
-		// 			}
-		// 		}
-		// 		if p==len(temp) {
-		// 			temp = append(temp,candi)
-		// 		}
-		// 		if len(temp)==26 {
-		// 			break
-		// 		}
-		// 	}
-
-		// 	k = 0
-		// 	for a:=0 ; a<5 ; a++ {
-		// 		var temp1 string
-		// 		for b:=0 ; b<5 ; b++ {
-		// 			temp1 = temp1 + temp[k] + ". "
-		// 			k++
-		// 		}
-		// 		result = append(result, temp1)
-		// 	}
-		// 	return result
-		// }
 		alreadyPresent := false
 		for j = 0; j < len(result); j++ {
 			if candidate == result[j].Text[0] {
@@ -203,15 +173,15 @@ func GenerateCaption(captions *[]models.Caption, tags *[]models.Tag, captionLeng
 			}
 			result = append(result, candidateCaption)
 		}
-		if len(result) == 5 {
+		if len(result) == numberOfResultsToReturn {
 			break
 		}
 	}
 	return result
 }
 
-//CalculatePointShort function calculates points of every lines for tags
-func CalculatePointShort(captions *[]models.Caption, tags *[]models.Tag) [][]float64 {
+// CalculatePoint function calculates points of every lines for tags
+func CalculatePoint(captions *[]models.Caption, tags *[]models.Tag, captionLength int) [][]float64 {
 	linePoints := make([][]float64, len(*captions))
 	for index, caption := range *captions {
 		linePoints[index] = make([]float64, len(caption.Text))
@@ -222,6 +192,22 @@ func CalculatePointShort(captions *[]models.Caption, tags *[]models.Tag) [][]flo
 				if strings.Contains(line, tag.Name) {
 					linePoints[indexX][indexY] += tag.Confidence
 				}
+			}
+		}
+	}
+
+	var numLinesInCaption int
+	if captionLength==1 {
+		return linePoints
+	} else if captionLength==2 {
+		numLinesInCaption = midCaptionLines
+	} else {
+		numLinesInCaption = longCaptionLines
+	}
+	for indexX, caption := range *captions {
+		for indexY:=0; indexY<len(caption.Text)-numLinesInCaption+1; indexY++ {
+			for nextLine:=1; nextLine<numLinesInCaption; nextLine++ {
+				linePoints[indexX][indexY] += linePoints[indexX][indexY + nextLine]
 			}
 		}
 	}
@@ -246,28 +232,6 @@ func GetListMaxValue(vals *[][]float64) PairList {
 	sort.Sort(sort.Reverse(pl))
 	return pl
 }
-
-//GetCaptionsLines function gets lines from Caption list
-// func GetCaptionsLines(captions *[]models.Caption) [][]string {
-// 	allLines := make([][]string, len(*captions))
-// 	var res [][]string
-// 	for index, caption := range *captions {
-// 		lines := strings.Split(Caption.Lyrics, "\n")
-// 		allLines[index] = lines
-// 	}
-// 	for _, lines := range allLines {
-// 		var tmp []string
-// 		for _, line := range lines {
-// 			if len(line) != 0 && line[0] != '[' {
-// 				tmp = append(tmp, line)
-// 			}
-// 		}
-// 		if len(tmp) != 0 {
-// 			res = append(res, tmp)
-// 		}
-// 	}
-// 	return res
-// }
 
 // getTagsFromImage for /getTagsfromImage endpoint
 func getTagsFromImage(c *gin.Context) {
