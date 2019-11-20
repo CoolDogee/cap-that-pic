@@ -11,7 +11,7 @@ function displayHashtags(tags) {
   if (!tags || !tags.length) {
     return '';
   }
-  var tagshash = tags.map(t => '#' + t.replace(" ", "_"));
+  var tagshash = tags.map(t => '#' + t.split(" ").join("_"));
 
   return tagshash.join(', ');
 }

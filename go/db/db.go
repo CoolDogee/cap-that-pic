@@ -315,7 +315,7 @@ func SetupDB() {
 }
 
 func AddCaptionToDB(client *mongo.Client, caption *models.Caption) error {
-	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
+	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
 	_, err := collection.InsertOne(context.TODO(), *caption)
 	return err
 }
@@ -328,7 +328,7 @@ func AddPostToDB(client *mongo.Client, post *models.Post) error {
 
 func GetCaptionByID(client *mongo.Client, id string) (*models.Caption, error) {
 	var result models.Caption
-	collection := client.Database("CAP-THAT-PIC").Collection("Caption")
+	collection := client.Database("CAP-THAT-PIC").Collection("Captions")
 	objID, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.D{{"_id", objID}}
 

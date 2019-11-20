@@ -8,20 +8,40 @@ import Footer from "./Footer";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaQuoteLeft, FaQuoteRight, FaCheck } from "react-icons/fa";
 import Logo from "../images/capthatpic.png";
+import ImageFilter from "react-image-filter";
+// https://muffinman.io/react-image-filter/
 
 function displayHashtags(tags) {
-  var tagshash = tags.map(t => '#' + t.replace(" ","_"));
+  if (!tags || !tags.length) {
+    return '';
+  }
+  var tagshash = tags.map(t => '#' + t.split(" ").join("_"));
 
   return tagshash.join(', ');
 }
+
+function readableNum(num) {
+  return Math.round(num * 100) / 100
+}
+
+const NONE = [
+  1, 0, 0, 0, 0,
+  0, 1, 0, 0, 0,
+  0, 0, 1, 0, 0,
+  0, 0, 0, 1, 0,
+];
+
 export const CaptionsPage = () => {
   const [message, setMessage] = useState("");
   const [chosenCaption, setCaption] = useState({});
-  const [hashtags, setHashtags] = useState([]);
-  // TODO
-  const [filter, setFilter] = useState("");
+  const [values, setValues] = useState([...NONE]);
+  const [filter, setFilter] = useState(values);
+  const [applyFilter, setApplyFilter] = useState(true);
+  const [colorOne, setColorOne] = useState(null);
+  const [colorTwo, setColorTwo] = useState(null);
   const [generatedCaptions, setGeneratedCaptions] = useState([]);
-  const [loading, setLoadingstatus] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [loading, setLoadingstatus] = useState(true);
   const [initialFetch, setInitialFetch] = useState(false);
 
   const onChangeCaption = e => {
@@ -31,49 +51,44 @@ export const CaptionsPage = () => {
     delayMessage("");
   };
 
-  // temporary data
-  const tempData = [
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-    { "Text": "Beautiful", "Src": "Kayabacho", "Tags": ["story"] },
-    { "Text": "Lively", "Src": "link.com", "Tags": ["life", "lessons"] },
-    { "Text": "Oustanding", "Src": "home.net", "Tags": ["grammy", "nana", "solo"] },
-  ];
+  const filterNames = ['invert', 'grayscale', 'sepia'];
 
-  const tempTags = ["cool", "chill"];
+  const getFilterString = (fil, colOne, colTwo) => {
+    console.log('Got for detection');
+    console.log(colOne, colTwo);
+    if (filterNames.includes(fil)) {
+      return fil;
+    }
+    if (JSON.stringify(colOne) === JSON.stringify([250, 50, 50]) && JSON.stringify(colTwo) === JSON.stringify([20, 20, 100])) {
+      return "Duotone (red / blue)";
+    } else if (JSON.stringify(colOne) === JSON.stringify([50, 250, 50]) && JSON.stringify(colTwo) === JSON.stringify([250, 20, 220])) {
+      return "Duotone (green / purple)";
+    } else if (JSON.stringify(colOne) === JSON.stringify([40, 250, 250]) &&JSON.stringify(colTwo) ===JSON.stringify([250, 150, 30])) {
+      return "Duotone (light blue/orange)";
+    } else if (JSON.stringify(colOne) === JSON.stringify([40, 70, 200]) && JSON.stringify(colTwo) === JSON.stringify([220, 30, 70])) {
+      return "Duotone (blue / red)";
+    }
+    return typeof fil === 'string' ? fil : 'none';
+  }
 
   const onSubmit = async e => {
     e.preventDefault();
+    console.log(chosenCaption);
 
-    var postCaption = chosenCaption;
-    postCaption.UserGenerated = true;
-
-    axios.post(API_URL + '/api/v1/caption', {
-      Text: [chosenCaption.Text],
-      Src : chosenCaption.Src || "",
-      Mood: chosenCaption.Mood || [],
-      Tags: chosenCaption.Tags || [],
-      Type: chosenCaption.Type || "",
-      UserGenerated: true 
-    })
+    axios.post(API_URL + '/api/v1/caption', chosenCaption)
       .then(function (response) {
         console.log("caption made");
         console.log(response.data.info);
         var captionID = response.data.info;
         // caption created successfully
 
+        console.log('Setting filter');
+        console.log(getFilterString(filter, colorOne, colorTwo));
         axios.post(API_URL + '/api/v1/post', {
-          ImgURL    : localStorage.getItem('imageUrl'),
-          CaptionID : captionID,
-          Filter    : "",
-          Tags      : chosenCaption.Tags.concat(hashtags)
+          ImgURL: localStorage.getItem('imageUrl'),
+          CaptionID: captionID,
+          Filter: getFilterString(filter, colorOne, colorTwo),
+          Tags: chosenCaption.Tags.concat(tags.map((tag) => tag.Name))
         })
           .then(function (resp) {
             // successful post creation
@@ -96,10 +111,6 @@ export const CaptionsPage = () => {
         console.log("Could not create caption");
         console.log(error.response);
         setMessage('Could not create caption!');
-        // could not create caption
-        // message = error.response.data;
-        // document.getElementById("alertmsg").innerHTML = message;
-        // console.log(error.response.data);
       });
   };
 
@@ -122,43 +133,50 @@ export const CaptionsPage = () => {
   // const getCaptions = async() => {
   const getCaptions = () => {
     setInitialFetch(true);
-    try {
-      setLoadingstatus(true);
-      // const res = await axios.get(API_URL + "/api/v1/getcaption", {
-      //   params: { fileName: localStorage.getItem("imageUrl") }
-      // });
-      var res = {
-        status: 200,
-        data: { captions: tempData, tags: tempTags },
-      };
-      setLoadingstatus(false);
-      if (res.status === 200) {
-        setGeneratedCaptions(res.data.captions);
-        setHashtags(res.data.tags);
-        console.log(res.data);
-        setMessage("Choose a caption that you like!");
-        // disappear message after a while
-        delayMessage("");
-      }
-    } catch (err) {
-      // console.log(err.response);
-      // if (err.response.status === 500) {
-      //   setMessage("Internal Server Error!");
-      // } else {
-      //   setMessage(err.response.data);
-      // }
-      delayMessage("Server seems to be down. Please try after some time.");
-    }
+    setLoadingstatus(true);
+    axios.get(API_URL + '/api/v1/getcaption', {
+      params: { fileName: localStorage.getItem('imageUrl'), 
+                length: localStorage.getItem('length') || 1 }
+    })
+      .then(function (response) {
+        console.log('Captions found');
+        console.log(response.data);
+        setGeneratedCaptions(response.data.captions);
+        setTags(response.data.imageTagsByAzure);
+
+      })
+      .catch(function (error) {
+        setMessage("No captions could be generated!");
+        console.log(error.response);
+      });
+    setLoadingstatus(false);
   };
 
   if (!initialFetch) {
     getCaptions();
   }
 
+  // reflect change in filter
+  const ButtonFilter = (e, fil, val, colOne, colTwo) => {
+    e.preventDefault();
+    console.log("Changing filters");
+    console.log({filter: fil, colOne: colOne, colTwo: colTwo});
+    setApplyFilter(true); setFilter(fil);
+    if (val) {
+      setValues(val);
+    }
+    if (colOne) {
+      setColorOne(colOne);
+    }
+    if (colTwo) {
+      setColorTwo(colTwo);
+    }
+  }
+
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <img src={Logo} style={{height: "1.5em"}}/> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
     </h1>
       <h4 className="text-center mb-4">
         <Typist>Beautiful Things Don't Ask For Attention. But They Deserve A Perfect Caption</Typist>
@@ -169,13 +187,12 @@ export const CaptionsPage = () => {
         <Row>
           {/* The image, in its full glory */}
           <Col lg="4" md="12">
-            <img
-              style={{ width: "100%" }}
-              src={localStorage.getItem("imageUrl")}
-              className="img-fluid"
-              alt=""
+            <ImageFilter image={localStorage.getItem("imageUrl")}
+              key="keykey" filter={applyFilter ? filter : NONE}
+              colorOne={colorOne} colorTwo={colorTwo}
+              onChange={(m) => { setValues(m) }}
             />
-            <Card>
+            <Card style={{ marginTop: "1em" }}>
               <Card.Body>
                 <Card.Title>
                   Caption
@@ -194,32 +211,87 @@ export const CaptionsPage = () => {
                 />
               </form>
               : null}
+            {tags.length ?
+              <Card style={{ marginTop: "1em" }}>
+                <Card.Body>
+                  <Card.Title>
+                    Tags identified
+              </Card.Title>
+                  <Card.Text>
+                    <b>Tag <span style={{ float: "right" }}>Confidence</span><br /></b>
+                    {tags.map((tag) =>
+                      <div>
+                        {tag.Name}<span style={{ float: "right" }}>{readableNum(tag.Confidence)}</span><br />
+                      </div>
+                    )}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+              : null}
           </Col>
 
           {/* Filter options, and caption menu */}
-          <Col lg="8" md="12">
-            {loading ? <Loading /> : null}
+          <Col lg="1"></Col>
+          <Col lg="7" md="12">
             {/* Add filters here */}
             <Row >
-              <Col lg="12"><span style={{ fontFamily: "sans-serif", fontWeight: "500" }}>
-                Displaying Top 10 captions for your image
-                  </span></Col>
-              {generatedCaptions.map((caption) =>
-                <Col lg="12" style={{ marginTop: "1.5em" }}>
-                  <Card>
-                    <Card.Body>
-                      <Button variant="primary" style={{ float: "right" }} onClick={(e) => {onChangeCaption(caption)}}><FaCheck /></Button>
+              <Col lg="12">
+                Choose filters
+                <Row style={{ marginTop: "0.3em" }}>
+                  <Col md="2"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, NONE, NONE, null, null) }}>None
+                  </Button></Col>
 
-                      <Card.Title style={{ fontStyle: "italic" }}>
-                        <FaQuoteLeft style={{ height: "0.5em", marginTop:"-0.7em"}} />
-                        {caption.Text}
-                        <FaQuoteRight style={{ height: "0.5em", marginTop: "-0.7em" }} />
-                      </Card.Title>
-                      <Card.Text className="text-muted">{displayHashtags(caption.Tags)}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              )}
+                  <Col md="2"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'invert', null, null, null) }}> Invert
+                  </Button></Col>
+
+                  <Col md="2"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'grayscale', null, null, null) }}> Grayscale
+                  </Button></Col>
+
+                  <Col md="2"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'sepia', null, null, null) }}> Sepia
+                  </Button></Col>
+
+                  <Col md="4"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [250, 50, 50], [20, 20, 100]) }}> Duotone (red / blue)
+                  </Button></Col>
+                </Row>
+                <Row style={{ marginTop: "1em" }}>
+                  <Col md="4"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [50, 250, 50], [250, 20, 220]) }}> Duotone (green / purple)
+                  </Button></Col>
+
+                  <Col md="4"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 250, 250], [250, 150, 30]) }}> Duotone (light blue/orange)
+                  </Button></Col>
+
+                  <Col md="4"><Button variant="secondary"
+                    onClick={(e) => { ButtonFilter(e, 'duotone', null, [40, 70, 200], [220, 30, 70]) }}> Duotone (blue / red)
+                  </Button></Col>
+
+                </Row>
+              </Col>
+
+              <Col lg="12" style={{ marginTop: "2em" }}>Displaying Top 10 captions for your image</Col>
+              {Object.keys(generatedCaptions).length || loading ?
+                generatedCaptions.map((caption) =>
+                  <Col lg="12" style={{ marginTop: "1.5em" }}>
+                    <Card>
+                      <Card.Body>
+                        <Button variant="primary" style={{ float: "right" }} onClick={(e) => { onChangeCaption(caption) }}><FaCheck /></Button>
+
+                        <Card.Title style={{ fontStyle: "italic" }}>
+                          <FaQuoteLeft style={{ height: "0.5em", marginTop: "-0.7em" }} />
+                          {caption.Text}
+                          <FaQuoteRight style={{ height: "0.5em", marginTop: "-0.7em" }} />
+                        </Card.Title>
+                        <Card.Text className="text-muted">{displayHashtags(caption.Tags)}</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ) : <Loading />}
             </Row>
 
           </Col>

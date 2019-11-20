@@ -14,12 +14,48 @@ import {
   RedditShareButton, RedditIcon,
 } from 'react-share';
 import Logo from "../images/capthatpic.png";
+import ImageFilter from "react-image-filter";
+
+const NONE = [
+  1, 0, 0, 0, 0,
+  0, 1, 0, 0, 0,
+  0, 0, 1, 0, 0,
+  0, 0, 0, 1, 0,
+];
+
+const colorFilter = {
+  "Duotone (red / blue)": [[250, 50, 50], [20, 20, 100]],
+  "Duotone (green / purple)": [[50, 250, 50], [250, 20, 220]],
+  "Duotone (light blue/orange)": [[40, 250, 250], [250, 150, 30]],
+  "Duotone (blue / red)": [[40, 70, 200], [220, 30, 70]],
+};
+
+function getFilterObj(filter) {
+  var filterObj = { filter: NONE, colorOne: null, colorTwo: null };
+  if (!filter) {
+    return filterObj;
+  }
+  if (filter === 'none') return filterObj;
+
+  if (!filter.startsWith('Duotone')) {
+    filterObj.filter = filter;
+    return filterObj;
+  }
+  else {
+    filterObj.filter = 'duotone';
+  }
+
+  if (filter in colorFilter) {
+    [filterObj.colorOne, filterObj.colorTwo] = colorFilter[filter]
+  }
+  return filterObj;
+}
 
 function displayHashtags(tags) {
   if (!tags || !tags.length) {
     return '';
   }
-  var tagshash = tags.map(t => '#' + t.replace(" ", "_"));
+  var tagshash = tags.map(t => '#' + t.split(" ").join("_"));
 
   return tagshash.join(', ');
 }
@@ -30,8 +66,9 @@ export const PostPage = () => {
   const [post, setPost] = useState({});
   const [loading, setLoadingstatus] = useState(false);
   const [initialFetch, setInitialFetch] = useState(false);
-  // unset imageurl
+  // unset local variables
   localStorage.removeItem('imageUrl');
+  localStorage.removeItem('length');
 
   const getPost = () => {
     setInitialFetch(true);
@@ -73,7 +110,7 @@ export const PostPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <img src={Logo} style={{ height: "1.5em" }} /> Cap That Pic
+        <img src={Logo} style={{ height: "1.5em" }} /> <a href="/">Cap That Pic</a>
     </h1>
       <hr></hr>
       {message ? <Message msg={message} /> : null}
@@ -82,14 +119,13 @@ export const PostPage = () => {
           <Col md="12">{loading ? <Loading /> : null}</Col>
           {/* The image, in its full glory */}
           <Col lg="4">
-            <img
-              style={{ maxwidth: "100%" }}
-              src={post.ImgURL || "https://bitsofco.de/content/images/2018/12/broken-1.png"}
-              className="img-fluid" alt=""
+            <ImageFilter image={post.ImgURL || "https://bitsofco.de/content/images/2018/12/broken-1.png"}
+              filter={getFilterObj(post.Filter).filter}
+              colorOne={getFilterObj(post.Filter).colorOne} colorTwo={getFilterObj(post.Filter).colorTwo}
             />
           </Col>
           <Col lg="1"></Col>
-          <Col lg="6" md="12">
+          <Col lg="7" md="12">
             <Row style={{ marginTop: '3em' }}></Row>
             <Row style={{ fontStyle: "italic", fontSize: "3em", align: "center" }} className="text-muted">
               <FaQuoteLeft style={{ height: "0.5em" }} />
@@ -112,13 +148,13 @@ export const PostPage = () => {
                 </FacebookShareButton>
                 <TwitterShareButton
                   url={window.location}
-                  title={caption.Text ? caption.Text[0] : ''}
+                  title={caption.Text ? caption.Text[0] + ' ' + displayHashtags(post.Tags) : displayHashtags(post.Tags)}
                   style={{ marginLeft: "1em" }}>
                   <TwitterIcon size={32} round />
                 </TwitterShareButton>
                 <WhatsappShareButton
                   url={window.location}
-                  title={caption.Text ? caption.Text[0] : ''}
+                  title={caption.Text ? caption.Text[0] + ' ' + displayHashtags(post.Tags) : displayHashtags(post.Tags)}
                   separator=":: " style={{ marginLeft: "1em" }}>
                   <WhatsappIcon size={32} round />
                 </WhatsappShareButton>
