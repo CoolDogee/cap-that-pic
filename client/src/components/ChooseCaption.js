@@ -51,9 +51,14 @@ export const CaptionsPage = () => {
     delayMessage("");
   };
 
+  const filterNames = ['invert', 'grayscale', 'sepia'];
+
   const getFilterString = (fil, colOne, colTwo) => {
     console.log('Got for detection');
     console.log(colOne, colTwo);
+    if (filterNames.includes(fil)) {
+      return fil;
+    }
     if (JSON.stringify(colOne) === JSON.stringify([250, 50, 50]) && JSON.stringify(colTwo) === JSON.stringify([20, 20, 100])) {
       return "Duotone (red / blue)";
     } else if (JSON.stringify(colOne) === JSON.stringify([50, 250, 50]) && JSON.stringify(colTwo) === JSON.stringify([250, 20, 220])) {
