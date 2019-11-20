@@ -110,7 +110,7 @@ export const PostPage = () => {
   return (
     <Fragment>
       <h1 className="display-3 text-center mb-4">
-        <img src={Logo} style={{ height: "1.5em" }} /> <a href="/">Cap That Pic</a>
+        <img src={Logo} style={{ height: "1.5em" }} alt=""/> <a href="/">Cap That Pic</a>
     </h1>
       <hr></hr>
       {message ? <Message msg={message} /> : null}
